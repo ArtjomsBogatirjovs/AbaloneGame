@@ -94,7 +94,7 @@ public class MovementValidator implements Validatable<Movement> {
             if (fields.contains(tempField)) {
                 continue;
             }
-            if (tempField.getBall() != null) {
+            if (tempField.getColor() != null) {//getBall
                 ballToMove++;
             } else {
                 return true;
@@ -125,7 +125,7 @@ public class MovementValidator implements Validatable<Movement> {
 
     public boolean isMovementEmpty(Movement move) {
         for (Field tempField : move.getFields()) {
-            if (tempField.getBall() == null) {
+            if (tempField.getColor() == null) {//getBall
                 return true;
             }
         }
@@ -151,7 +151,7 @@ public class MovementValidator implements Validatable<Movement> {
         for (Field field : fields) {
             Field fieldToMove = bService.findField(xDir + field.getXCord(), yDir + field.getYCord(), boardAsList);
             if (!fields.contains(fieldToMove)) {
-                if (fieldToMove.getBall() != null) {
+                if (fieldToMove.getColor() != null) {//getBall
                     return true;
                 }
             }

@@ -14,7 +14,7 @@ import static com.example.abalonegame.db.domain.Board.BOARD_SIZE;
 
 @Service
 public class BoardService { //TODO custom board create
-//    private final static Ball B = new Ball(BLACK);
+    //    private final static Ball B = new Ball(BLACK);
 //    private final static Ball W = new Ball(WHITE);
 //    private final static int BOARD_SIZE = 11;
 //    private final static int GAMING_BOARD_MIDDLE = BOARD_SIZE / 2;
@@ -71,7 +71,8 @@ public class BoardService { //TODO custom board create
         }
         return result;
     }
-@Deprecated
+
+    @Deprecated
     public Board makeMove(Board board, Movement move) {//TODO i'm tired need to refactor this method
         FieldService fieldService = null;//new FieldService(fieldRepository);
         DirectionService dService = new DirectionService();
@@ -82,11 +83,11 @@ public class BoardService { //TODO custom board create
         int xDirection = dService.getDirection(direction, DirectionType.X);
         int yDirection = dService.getDirection(direction, DirectionType.Y);
 
-        Set<Field> tempBoard =null;// boardToFieldList(board.getGameBoard());
+        Set<Field> tempBoard = null;// boardToFieldList(board.getGameBoard());
         //move.getBoard().setFieldList(tempBoard);//TODO possible null refactor this method
         Field currentField = mService.getLastFieldInChain(move);
         Field fieldToMove = findField(currentField.getXCord() + xDirection, currentField.getYCord() + yDirection, tempBoard);
-        if (fieldToMove.getBall() == null) {
+        if (fieldToMove.getColor() == null) { //getBall
             for (Field f : fieldsToMove) {
                 currentField = findField(f, tempBoard);
                 fieldToMove = findField(currentField.getXCord() + xDirection, currentField.getYCord() + yDirection, tempBoard);
@@ -122,7 +123,7 @@ public class BoardService { //TODO custom board create
 
         for (int i = 0; i < BOARD_SIZE; i++) {
             tempField = findField(tempField.getXCord() + xDirection, tempField.getYCord() + yDirection, board);
-            if (tempField.getBall() == null) {
+            if (tempField.getColor() == null) {
                 return tempField;
             }
         }
@@ -148,7 +149,7 @@ public class BoardService { //TODO custom board create
             return board.stream()
                     .filter(field -> field.getXCord() == fieldToFind.getXCord())
                     .filter(field -> field.getYCord() == fieldToFind.getYCord())
-                    .filter(field -> field.getBall().equals(fieldToFind.getBall()))
+                    .filter(field -> field.getColor().equals(fieldToFind.getColor()))//getBall
                     .findAny()
                     .orElse(null);
         }
@@ -163,7 +164,6 @@ public class BoardService { //TODO custom board create
 
         return null;
     }
-
 
 
 }

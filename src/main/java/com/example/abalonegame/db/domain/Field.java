@@ -1,5 +1,6 @@
 package com.example.abalonegame.db.domain;
 
+import com.example.abalonegame.enums.Color;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,8 +20,8 @@ public class Field {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
-    @OneToOne(cascade = CascadeType.ALL)
-    private Ball ball;
+    @Enumerated(EnumType.STRING)
+    private Color color;
     @JoinColumn(name = "board_id", nullable = false)
     @ManyToOne(cascade = CascadeType.ALL)
     private Board board;
@@ -36,12 +37,12 @@ public class Field {
         this.yCord = yCord;
     }
 
-    public Ball getBall() {
-        return ball;
+    public Color getColor() {
+        return color;
     }
 
-    public void setBall(Ball ball) {
-        this.ball = ball;
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public int getXCord() {
@@ -60,13 +61,14 @@ public class Field {
         isDropField = dropField;
     }
 
-    public Field(Ball ball, int xCord, int yCord) {
-        this.ball = ball;
+    public Field(int xCord, int yCord, boolean isDropField) {
         this.xCord = xCord;
         this.yCord = yCord;
+        this.isDropField = isDropField;
     }
-
-    public Field(int xCord, int yCord, boolean isDropField) {
+    public Field(Color color, Board board, int xCord, int yCord, boolean isDropField) {
+        this.color = color;
+        this.board = board;
         this.xCord = xCord;
         this.yCord = yCord;
         this.isDropField = isDropField;

@@ -1,7 +1,4 @@
-var abalone = angular.module('abalone', ['ngRoute','gameModule']);
-
-
-
+const abalone = angular.module('abalone', ['ngRoute', 'gameModule']);
 
 abalone.config(['$routeProvider', function($routeProvider) {
     $routeProvider.

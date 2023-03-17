@@ -4,10 +4,12 @@ import com.example.abalonegame.db.domain.Ball;
 import com.example.abalonegame.db.domain.Board;
 import com.example.abalonegame.db.domain.Field;
 import com.example.abalonegame.db.repository.FieldRepository;
+import com.example.abalonegame.enums.Color;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -28,52 +30,38 @@ public class FieldService {
 
     //FINISHED
     public void createFieldsForBoard(Board board) {
-        Field[][] gameBoard = new Field[BOARD_SIZE][BOARD_SIZE];
+        Set<Field> gameBoard = new HashSet<>();
         for (int x = 0; x <= GAMING_BOARD_MIDDLE; x++) {
             for (int y = 0; y < BOARD_SIZE; y++) {
-                if (x == GAMING_BOARD_MIDDLE && y > GAMING_BOARD_MIDDLE) {
+
+                if(x == GAMING_BOARD_MIDDLE && y > GAMING_BOARD_MIDDLE){
                     break;
                 }
 
-                int opX;
-                int opY;
-
                 if (DROP_FIELD == y || y - x >= GAMING_BOARD_MIDDLE || DROP_FIELD == x) {
-                    opX = GameUtil.calculateOppositeCord(x);
-                    opY = GameUtil.calculateOppositeCord(y);
-                    gameBoard[y][x] = new Field(x, y, true);
-                    gameBoard[opY][opX] = new Field(opX, opY, true);
+                    int opX = GameUtil.calculateOppositeCord(x);
+                    int opY = GameUtil.calculateOppositeCord(y);
+                    gameBoard.add(new Field(null,board,x, y, true));
+                    gameBoard.add(new Field(null,board,opX, opY, true));
                 } else if (x < 3 || (x == 3 && y < 6 && y > 2)) {
-                    gameBoard[y][x] = new Field(Ball.B, x, y);
-                    opX = GameUtil.calculateOppositeCord(x);
-                    opY = GameUtil.calculateOppositeCord(y);
-                    gameBoard[opY][opX] = new Field(Ball.W, opX, opY);
+                    int opX = GameUtil.calculateOppositeCord(x);
+                    int opY = GameUtil.calculateOppositeCord(y);
+                    gameBoard.add(new Field(Color.BLACK,board,x, y, false));
+                    gameBoard.add(new Field(Color.WHITE,board,opX, opY, false));
                 } else {
-                    gameBoard[y][x] = new Field(x, y);
-                    opX = GameUtil.calculateOppositeCord(x);
-                    opY = GameUtil.calculateOppositeCord(y);
-                    gameBoard[opY][opX] = new Field(opX, opY);
-                }
-
-                Field tempField = gameBoard[y][x];
-                Field tempOpField = gameBoard[opY][opX];
-
-                tempField.setBoard(board);
-                tempOpField.setBoard(board);
-
-                if (tempField.equals(tempOpField)) { //TO AVOID DUPLICATES
-                    fieldRepository.save(tempOpField);
-                } else {
-                    fieldRepository.save(tempOpField);
-                    fieldRepository.save(tempField);
+                    int opX = GameUtil.calculateOppositeCord(x);
+                    int opY = GameUtil.calculateOppositeCord(y);
+                    gameBoard.add(new Field(null,board,x, y, false));
+                    gameBoard.add(new Field(null,board,opX, opY, false));
                 }
             }
         }
+        fieldRepository.saveAll(gameBoard);
     }
 
     public boolean transferBall(Field field, Field fieldToMove) {
-        fieldToMove.setBall(field.getBall());
-        field.setBall(null);
+       // fieldToMove.setBall(field.getBall());
+        //field.setBall(null);
         return true;
     }
 

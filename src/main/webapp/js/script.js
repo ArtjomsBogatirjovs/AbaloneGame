@@ -1,9 +1,7 @@
 
-var turns = [["#", "#", "#"], ["#", "#", "#"], ["#", "#", "#"]];
 var num = 0;
 var gameOn = false;
 
-onload;
 
 function playerTurn(id) {
     if (gameOn) {

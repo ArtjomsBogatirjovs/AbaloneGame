@@ -17,11 +17,11 @@ import com.example.abalonegame.validator.MovementValidator;
 import com.example.abalonegame.validator.Validatable;
 import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.abalonegame.enums.GameStatus.FINISHED;
 import static com.example.abalonegame.enums.GameStatus.IN_PROGRESS;
@@ -30,17 +30,17 @@ import static com.example.abalonegame.enums.GameStatus.IN_PROGRESS;
 @Service
 public class GameplayService {
 
-    private final GameplayRepository gameRepository;
-   // @Autowired
+    private final GameplayRepository gameplayRepository;
+    // @Autowired
     //private MovementService moveService;
-   // @Autowired
+    // @Autowired
     //private PlayerService playerService;
-   // @Autowired
-   // private BoardService bService;
+    // @Autowired
+    // private BoardService bService;
 
     @Autowired
     public GameplayService(GameplayRepository gameRepository) {
-        this.gameRepository = gameRepository;
+        this.gameplayRepository = gameRepository;
     }
 
     public Gameplay createGame(Player player, GameDTO gameDTO, Board gameBoard) {
@@ -52,8 +52,30 @@ public class GameplayService {
                 GameStatus.WAITS_FOR_PLAYER);
         gameplay.setCreated(new Date());
         gameplay.setBoard(gameBoard);
-        gameRepository.save(gameplay);
+        gameplayRepository.save(gameplay);
         return gameplay;
+    }
+
+    public Gameplay connectGame(Player player, GameDTO gameDTO) {
+        Gameplay gameplay =  getGameplay(gameDTO.getId());
+        gameplay.setPlayerTwo(player);
+        gameplay.setStatus(IN_PROGRESS);
+        gameplayRepository.save(gameplay);
+        return gameplay;
+    }
+
+    public List<Gameplay> getGamesToJoin(Player player) {
+        return gameplayRepository.findByGameTypeAndStatus(GameType.PvP, GameStatus.WAITS_FOR_PLAYER)
+                .stream()
+                .filter(gameplay -> gameplay.getPlayerOne() != player)
+                .collect(Collectors.toList());
+    }
+
+    public List<Gameplay> getPlayerGames(Player player) {
+        return gameplayRepository.findByStatus(GameStatus.IN_PROGRESS)
+                .stream()
+                .filter(gameplay -> gameplay.getPlayerOne() == player)
+                .collect(Collectors.toList());
     }
 
     public Gameplay connectToGame(Player player, GameDTO gameDTO) throws NotFoundException, InvalidGameException {
@@ -81,7 +103,7 @@ public class GameplayService {
 
     @NotNull
     public Gameplay getGameplay(Long id) {
-        return gameRepository.findById(id).get();
+        return gameplayRepository.findById(id).get(); //TODO catch error
     }
 
     public Gameplay makeMovement(MoveDTO moveDTO, Gameplay gameplay) throws NotFoundException, InvalidGameException {

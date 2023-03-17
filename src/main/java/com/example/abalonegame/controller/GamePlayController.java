@@ -1,11 +1,9 @@
 package com.example.abalonegame.controller;
 
-
 import com.example.abalonegame.db.domain.Board;
 import com.example.abalonegame.db.domain.Gameplay;
 import com.example.abalonegame.db.domain.Player;
 import com.example.abalonegame.dto.GameDTO;
-import com.example.abalonegame.dto.MoveDTO;
 import com.example.abalonegame.exception.InvalidGameException;
 import com.example.abalonegame.exception.NotFoundException;
 import com.example.abalonegame.service.BoardService;
@@ -14,13 +12,11 @@ import com.example.abalonegame.service.GameplayService;
 import com.example.abalonegame.service.PlayerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -38,29 +34,34 @@ public class GamePlayController {
     HttpSession httpSession;
 
     @PostMapping("/create")
-    public ResponseEntity<Gameplay> start(@RequestBody GameDTO gameDTO) {
+    public Gameplay start(@RequestBody GameDTO gameDTO) {
         Player tempPlayer = playerService.getLoggedUser();
         Board gameplayBoard = boardService.getNewBoard();
         fieldService.createFieldsForBoard(gameplayBoard);
         Gameplay gameplay = gameplayService.createGame(tempPlayer, gameDTO, gameplayBoard);
         httpSession.setAttribute("gameId", gameDTO.getId());
         log.info("start game request: {}", tempPlayer);
-        return ResponseEntity.ok(gameplay);
+        return gameplay;
+    }
+
+    @RequestMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Gameplay> getGamesToJoin() {
+        return gameplayService.getGamesToJoin(playerService.getLoggedUser());
+    }
+
+    @RequestMapping(value = "/player/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Gameplay> getPlayerGames() {
+        return gameplayService.getPlayerGames(playerService.getLoggedUser());
     }
 
     @PostMapping("/connect")
-    public ResponseEntity<Gameplay> connectRandom(@RequestBody GameDTO gameDTO) throws NotFoundException, InvalidGameException {
-        //log.info("connect request {}", player);
-        return ResponseEntity.ok(gameplayService.connectToGame(playerService.getLoggedUser(), gameDTO));
+    public Gameplay connectRandom(@RequestBody GameDTO gameDTO) throws NotFoundException, InvalidGameException {
+        return gameplayService.connectGame(playerService.getLoggedUser(), gameDTO);
     }
 
-    @PostMapping("/gameplay")
-    public ResponseEntity<Gameplay> gamePlay(@RequestBody MoveDTO moveDTO) throws NotFoundException, InvalidGameException {
-        Long gameId = (Long) httpSession.getAttribute("gameId");
-        Gameplay game = gameplayService.getGameplay(gameId);
-        log.info("step request: {}", moveDTO);
-        Gameplay gameplay = gameplayService.makeMovement(moveDTO, game);
-        return ResponseEntity.ok(gameplay);
+    @RequestMapping(value = "/{id}")
+    public Gameplay getGameProperties(@PathVariable Long id) {
+        httpSession.setAttribute("gameId", id);
+        return gameplayService.getGameplay(id);
     }
-
 }
