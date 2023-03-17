@@ -17,6 +17,8 @@ import java.util.Set;
 public class MovementService {
 
     private final MovementRepository moveRepository;
+    @Autowired
+    private BoardService bService;
 
     @Autowired
     public MovementService(MovementRepository moveRepository) {
@@ -38,7 +40,7 @@ public class MovementService {
 
     Field getLastFieldInChain(Movement move) {
         DirectionService dService = new DirectionService();
-        BoardService bService = new BoardService();
+        //BoardService bService = new BoardService(boardRepository);
 
         Direction direction = move.getDirection();
         Set<Field> fields = move.getFields();

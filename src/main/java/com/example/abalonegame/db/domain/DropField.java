@@ -1,11 +1,10 @@
 package com.example.abalonegame.db.domain;
 
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 
-@EqualsAndHashCode(callSuper = false)
+@Deprecated
 @Entity
 @NoArgsConstructor
 public class DropField extends Field {

@@ -5,6 +5,7 @@ import com.example.abalonegame.db.domain.Board;
 import com.example.abalonegame.db.domain.Direction;
 import com.example.abalonegame.db.domain.Field;
 import com.example.abalonegame.db.domain.Movement;
+import com.example.abalonegame.db.repository.GameplayRepository;
 import com.example.abalonegame.enums.DirectionType;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.IllegalMovementException;
@@ -12,15 +13,21 @@ import com.example.abalonegame.exception.InternalException;
 import com.example.abalonegame.service.BoardService;
 import com.example.abalonegame.service.DirectionService;
 import com.example.abalonegame.service.FieldService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-
+@Component
 public class MovementValidator implements Validatable<Movement> {
     public final static int MAX_MOVEMENT_FIELD_AMOUNT = 3;
     public final static int MIN_BALLS_TO_SUMITO = 2;
+    @Autowired
+    private BoardService bService = new BoardService(null);
 
     @Override
     public void validate(Movement move) {
@@ -59,7 +66,7 @@ public class MovementValidator implements Validatable<Movement> {
         if (!isSumito(move)) {
             return false;
         }
-        BoardService bService = new BoardService();
+        //BoardService bService = new BoardService(boardRepository);
         DirectionService dService = new DirectionService();
 
         Board board = move.getBoard();
@@ -103,7 +110,7 @@ public class MovementValidator implements Validatable<Movement> {
 
     public boolean isDirectionLikeRow(Movement move) {
         DirectionService dService = new DirectionService();
-        BoardService bService = new BoardService();
+        //BoardService bService = new BoardService(boardRepository);
         if (move.getFields().size() < MIN_BALLS_TO_SUMITO) {
             return true;
         }
@@ -131,7 +138,7 @@ public class MovementValidator implements Validatable<Movement> {
         if (move.getBoard() == null) {
             throw new InternalException(ExceptionMessage.NO_BOARD);
         }
-        BoardService bService = new BoardService();
+        //BoardService bService = new BoardService(boardRepository);
         DirectionService dService = new DirectionService();
 
         Board board = move.getBoard();

@@ -32,10 +32,12 @@ import static com.example.abalonegame.enums.GameStatus.IN_PROGRESS;
 public class GameplayService {
 
     private final GameplayRepository gameRepository;
-
+    @Autowired
     private MovementService moveService;
-
+    @Autowired
     private PlayerService playerService;
+    @Autowired
+    private BoardService bService;
 
     @Autowired
     public GameplayService(GameplayRepository gameRepository) {
@@ -45,7 +47,8 @@ public class GameplayService {
     public Gameplay createGame(Player player, GameDTO game) {
         Gameplay gameplay = new Gameplay();
 
-        Board gameBoard = BoardService.getNewBoard();
+        Board gameBoard = bService.getNewBoard();
+        gameBoard.setGameplay(gameplay);
         gameplay.setPlayerOne(player);
         gameplay.setGameType(game.getGameType());
         gameplay.setFirstPlayerColor(game.getColor());
@@ -87,7 +90,7 @@ public class GameplayService {
 
     public Gameplay makeMovement(MoveDTO moveDTO, Gameplay gameplay) throws NotFoundException, InvalidGameException {
         Validatable<Movement> moveValidator = new MovementValidator();
-        BoardService bService = new BoardService();
+        //BoardService bService = new BoardService(boardRepository);
         Board board = gameplay.getBoard();
         Movement movement = moveService.createMove(gameplay, playerService.getLoggedUser(), moveDTO);
 

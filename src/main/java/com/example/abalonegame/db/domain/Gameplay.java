@@ -33,7 +33,7 @@ public class Gameplay {
     @ManyToOne
     @JoinColumn(name = "second_player_id")
     private Player playerTwo;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Board board;
     @Enumerated(EnumType.STRING)
     private Color firstPlayerColor;

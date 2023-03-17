@@ -6,18 +6,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Field {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Ball ball;
     @JoinColumn(name = "board_id", nullable = false)
     @ManyToOne
@@ -26,6 +27,8 @@ public class Field {
     private int xCord;
     @Column(name = "y",nullable = false)
     private int yCord;
+    @Column(name = "DropField", nullable = false)
+    private boolean isDropField = false;
 
     public Field(int xCord, int yCord) {
         this.xCord = xCord;
@@ -48,9 +51,23 @@ public class Field {
         return yCord;
     }
 
+    public void setBoard(Board board) {
+        this.board = board;
+    }
+
+    public void setDropField(boolean dropField) {
+        isDropField = dropField;
+    }
+
     public Field(Ball ball, int xCord, int yCord) {
         this.ball = ball;
         this.xCord = xCord;
         this.yCord = yCord;
+    }
+
+    public Field(int xCord, int yCord, boolean isDropField) {
+        this.xCord = xCord;
+        this.yCord = yCord;
+        this.isDropField = isDropField;
     }
 }

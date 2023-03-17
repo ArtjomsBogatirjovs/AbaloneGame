@@ -23,7 +23,8 @@ public class Board {
     private Gameplay gameplay;
     @Transient
     private Field[][] gameBoard;
-    @OneToMany
+    //@OneToMany(cascade = CascadeType.ALL)
+    @Transient
     private Set<Field> fieldList = new HashSet<>(); //TODO change to set
 
     public Board(Field[][] gameBoard) {
@@ -35,7 +36,8 @@ public class Board {
     }
 
     public Field[][] getGameBoard() {
-        return gameBoard.clone();
+        //return gameBoard.clone(); TODO Find way to return copy
+        return gameBoard;
     }
 
     public void setGameBoard(Field[][] gameBoard) {
@@ -48,5 +50,17 @@ public class Board {
 
     public void setFieldList(Set<Field> fieldList) {
         this.fieldList = fieldList;
+    }
+
+    public Gameplay getGameplay() {
+        return gameplay;
+    }
+
+    public void setGameplay(Gameplay gameplay) {
+        this.gameplay = gameplay;
+    }
+
+    public long getId() {
+        return id;
     }
 }

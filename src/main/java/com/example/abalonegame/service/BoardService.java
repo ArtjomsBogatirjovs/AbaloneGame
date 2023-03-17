@@ -2,11 +2,12 @@ package com.example.abalonegame.service;
 
 import com.example.abalonegame.db.domain.*;
 
+import com.example.abalonegame.db.repository.BoardRepository;
 import com.example.abalonegame.enums.DirectionType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.example.abalonegame.enums.Color.BLACK;
 import static com.example.abalonegame.enums.Color.WHITE;
@@ -19,36 +20,50 @@ public class BoardService { //TODO custom board create
     private final static int BOARD_SIZE = 11;
     private final static int GAMING_BOARD_MIDDLE = BOARD_SIZE / 2;
     private final static int DROP_FIELD = 0;
+    private final BoardRepository boardRepository;
 
     private MovementService mService;
 
-    public static Board getNewBoard() {
-        Field[][] tempBoard = createBoard();
-        return new Board(tempBoard);
+    @Autowired
+    public BoardService(BoardRepository boardRepository) {
+        this.boardRepository = boardRepository;
+    }
+
+    public Board getNewBoard() {
+        Board entity = new Board();
+        Field[][] tempBoard = createBoard(entity);
+
+        entity.setGameBoard(tempBoard);
+        //entity.setFieldList(boardToFieldList(tempBoard));
+        return entity;
     }
 
 
-    public static Field[][] createBoard() {
+    public static Field[][] createBoard(Board board) {
 
         Field[][] gameBoard = new Field[BOARD_SIZE][BOARD_SIZE];
         for (int x = 0; x <= GAMING_BOARD_MIDDLE; x++) {
             for (int y = 0; y < BOARD_SIZE; y++) {
+                int opX;
+                int opY;
                 if (DROP_FIELD == y || y - x >= GAMING_BOARD_MIDDLE || DROP_FIELD == x) {
-                    int opX = calculateOppositeCord(x);
-                    int opY = calculateOppositeCord(y);
-                    gameBoard[y][x] = new DropField(x, y);
-                    gameBoard[opY][opX] = new DropField(opX, opY);
+                    opX = calculateOppositeCord(x);
+                    opY = calculateOppositeCord(y);
+                    gameBoard[y][x] = new Field(x, y, true);
+                    gameBoard[opY][opX] = new Field(opX, opY, true);
                 } else if (x < 3 || (x == 3 && y < 6 && y > 2)) {
                     gameBoard[y][x] = new Field(B, x, y);
-                    int opX = calculateOppositeCord(x);
-                    int opY = calculateOppositeCord(y);
+                    opX = calculateOppositeCord(x);
+                    opY = calculateOppositeCord(y);
                     gameBoard[opY][opX] = new Field(W, opX, opY);
                 } else {
                     gameBoard[y][x] = new Field(x, y);
-                    int opX = calculateOppositeCord(x);
-                    int opY = calculateOppositeCord(y);
+                    opX = calculateOppositeCord(x);
+                    opY = calculateOppositeCord(y);
                     gameBoard[opY][opX] = new Field(opX, opY);
                 }
+                gameBoard[y][x].setBoard(board);
+                gameBoard[opY][opX].setBoard(board);
             }
         }
         return gameBoard;
@@ -56,6 +71,7 @@ public class BoardService { //TODO custom board create
 
     public Set<Field> boardToFieldList(Field[][] board) {
         Set<Field> result = new HashSet<>();
+
         for (Field[] fieldArray : board) {
             result.addAll(Arrays.asList(fieldArray));
         }
@@ -89,12 +105,12 @@ public class BoardService { //TODO custom board create
             yDirection *= -1;
             for (int i = 0; i < BOARD_SIZE; i++) {
                 currentField = findField(currentField, tempBoard);
-                fieldToMove = findField(currentField.getXCord() + xDirection,currentField.getYCord() + yDirection,tempBoard);
-                if(mService.getLastFieldInChain(move).equals(fieldToMove)){
-                    fieldService.transferBall(fieldToMove,currentField);
+                fieldToMove = findField(currentField.getXCord() + xDirection, currentField.getYCord() + yDirection, tempBoard);
+                if (mService.getLastFieldInChain(move).equals(fieldToMove)) {
+                    fieldService.transferBall(fieldToMove, currentField);
                     break;
                 }
-                fieldService.transferBall(fieldToMove,currentField);
+                fieldService.transferBall(fieldToMove, currentField);
                 currentField = fieldToMove;
             }
         }
@@ -129,8 +145,8 @@ public class BoardService { //TODO custom board create
 
     public Field findField(Field fieldToFind, Integer x, Integer y, Set<Field> board) {
         if (board.contains(fieldToFind)) {
-           List<Field> tempList = new ArrayList<>(board);
-           int index = tempList.indexOf(fieldToFind);
+            List<Field> tempList = new ArrayList<>(board);
+            int index = tempList.indexOf(fieldToFind);
             return tempList.get(index);
         }
 

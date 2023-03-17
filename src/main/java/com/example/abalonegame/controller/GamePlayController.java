@@ -10,6 +10,7 @@ import com.example.abalonegame.exception.NotFoundException;
 import com.example.abalonegame.service.GameplayService;
 import com.example.abalonegame.service.PlayerService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,24 +23,26 @@ import javax.servlet.http.HttpSession;
 @Slf4j
 @RequestMapping("/game")
 public class GamePlayController {
-
+    @Autowired
     GameplayService gameplayService;
-
+    @Autowired
     PlayerService playerService;
-
+    @Autowired
     HttpSession httpSession;
 
     @PostMapping("/create")
-    public ResponseEntity<Gameplay> start(@RequestBody Player player, @RequestBody GameDTO gameDTO) {
+    public ResponseEntity<Gameplay> start(@RequestBody GameDTO gameDTO) {
+        Player tempPlayer = playerService.getLoggedUser();
+        Gameplay gameplay = gameplayService.createGame(tempPlayer, gameDTO);
         httpSession.setAttribute("gameId", gameDTO.getId());
-        log.info("start game request: {}", player);
-        return ResponseEntity.ok(gameplayService.createGame(player,gameDTO));
+        log.info("start game request: {}", tempPlayer);
+        return ResponseEntity.ok(gameplay);
     }
 
     @PostMapping("/connect")
     public ResponseEntity<Gameplay> connectRandom(@RequestBody GameDTO gameDTO) throws NotFoundException, InvalidGameException {
         //log.info("connect request {}", player);
-        return ResponseEntity.ok(gameplayService.connectToGame(playerService.getLoggedUser(),gameDTO));
+        return ResponseEntity.ok(gameplayService.connectToGame(playerService.getLoggedUser(), gameDTO));
     }
 
     @PostMapping("/gameplay")

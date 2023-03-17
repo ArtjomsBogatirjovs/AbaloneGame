@@ -17,7 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  */
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter{
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private PlayerRepository playerRepository;
@@ -33,14 +33,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                    .anyRequest().authenticated()
+                .antMatchers("/index.html")
+                .authenticated().anyRequest().permitAll()
                 .and()
-                    .formLogin().defaultSuccessUrl("/index.html", true)
-                     .usernameParameter("username")
-                     .passwordParameter("password")
+                .formLogin()
+                .defaultSuccessUrl("/index.html", true)
+                .usernameParameter("username")
+                .passwordParameter("password")
                 .and()
-                    .httpBasic()
+                .httpBasic()
                 .and()
-                    .csrf().disable();
+                .csrf().disable();
     }
 }
