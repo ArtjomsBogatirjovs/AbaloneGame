@@ -1,12 +1,15 @@
 package com.example.abalonegame.controller;
 
 
+import com.example.abalonegame.db.domain.Board;
 import com.example.abalonegame.db.domain.Gameplay;
 import com.example.abalonegame.db.domain.Player;
 import com.example.abalonegame.dto.GameDTO;
 import com.example.abalonegame.dto.MoveDTO;
 import com.example.abalonegame.exception.InvalidGameException;
 import com.example.abalonegame.exception.NotFoundException;
+import com.example.abalonegame.service.BoardService;
+import com.example.abalonegame.service.FieldService;
 import com.example.abalonegame.service.GameplayService;
 import com.example.abalonegame.service.PlayerService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +31,18 @@ public class GamePlayController {
     @Autowired
     PlayerService playerService;
     @Autowired
+    FieldService fieldService;
+    @Autowired
+    BoardService boardService;
+    @Autowired
     HttpSession httpSession;
 
     @PostMapping("/create")
     public ResponseEntity<Gameplay> start(@RequestBody GameDTO gameDTO) {
         Player tempPlayer = playerService.getLoggedUser();
-        Gameplay gameplay = gameplayService.createGame(tempPlayer, gameDTO);
+        Board gameplayBoard = boardService.getNewBoard();
+        fieldService.createFieldsForBoard(gameplayBoard);
+        Gameplay gameplay = gameplayService.createGame(tempPlayer, gameDTO, gameplayBoard);
         httpSession.setAttribute("gameId", gameDTO.getId());
         log.info("start game request: {}", tempPlayer);
         return ResponseEntity.ok(gameplay);

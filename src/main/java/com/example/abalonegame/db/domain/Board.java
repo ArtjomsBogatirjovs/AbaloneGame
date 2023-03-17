@@ -15,50 +15,52 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 public class Board {
+    public final static int BOARD_SIZE = 11;
+    public final static int GAMING_BOARD_MIDDLE = BOARD_SIZE / 2;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
-    @OneToOne
-    private Gameplay gameplay;
-    @Transient
-    private Field[][] gameBoard;
+    //@OneToOne
+    //private Gameplay gameplay;
+    //@Transient
+    //private Field[][] gameBoard;
     //@OneToMany(cascade = CascadeType.ALL)
-    @Transient
-    private Set<Field> fieldList = new HashSet<>(); //TODO change to set
+    //@Transient
+    //private Set<Field> fieldList = new HashSet<>(); //TODO change to set
 
-    public Board(Field[][] gameBoard) {
-        this.gameBoard = gameBoard;
-    }
+    //public Board(Field[][] gameBoard) {
+        //this.gameBoard = gameBoard;
+   // }
 
-    public Board(Set<Field> fieldList) {
-        this.fieldList = fieldList;
-    }
+    //public Board(Set<Field> fieldList) {
+    //    this.fieldList = fieldList;
+    //}
 
-    public Field[][] getGameBoard() {
-        //return gameBoard.clone(); TODO Find way to return copy
-        return gameBoard;
-    }
+//    public Field[][] getGameBoard() {
+//        //return gameBoard.clone(); TODO Find way to return copy
+//        return gameBoard;
+//    }
+//
+//    public void setGameBoard(Field[][] gameBoard) {
+//        this.gameBoard = gameBoard;
+//    }
+//
+//    public ArrayList<Field> getFieldList() {
+//        return new ArrayList<>(List.copyOf(fieldList));
+//    }
+//
+//    public void setFieldList(Set<Field> fieldList) {
+//        this.fieldList = fieldList;
+//    }
 
-    public void setGameBoard(Field[][] gameBoard) {
-        this.gameBoard = gameBoard;
-    }
+    //public Gameplay getGameplay() {
+    //    return gameplay;
+    //}
 
-    public ArrayList<Field> getFieldList() {
-        return new ArrayList<>(List.copyOf(fieldList));
-    }
-
-    public void setFieldList(Set<Field> fieldList) {
-        this.fieldList = fieldList;
-    }
-
-    public Gameplay getGameplay() {
-        return gameplay;
-    }
-
-    public void setGameplay(Gameplay gameplay) {
-        this.gameplay = gameplay;
-    }
+    //public void setGameplay(Gameplay gameplay) {
+       // this.gameplay = gameplay;
+    //}
 
     public long getId() {
         return id;

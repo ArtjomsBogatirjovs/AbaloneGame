@@ -9,17 +9,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.example.abalonegame.enums.Color.BLACK;
-import static com.example.abalonegame.enums.Color.WHITE;
+import static com.example.abalonegame.db.domain.Board.BOARD_SIZE;
 
 
 @Service
 public class BoardService { //TODO custom board create
-    private final static Ball B = new Ball(BLACK);
-    private final static Ball W = new Ball(WHITE);
-    private final static int BOARD_SIZE = 11;
-    private final static int GAMING_BOARD_MIDDLE = BOARD_SIZE / 2;
-    private final static int DROP_FIELD = 0;
+//    private final static Ball B = new Ball(BLACK);
+//    private final static Ball W = new Ball(WHITE);
+//    private final static int BOARD_SIZE = 11;
+//    private final static int GAMING_BOARD_MIDDLE = BOARD_SIZE / 2;
+//    private final static int DROP_FIELD = 0;
     private final BoardRepository boardRepository;
 
     private MovementService mService;
@@ -30,44 +29,39 @@ public class BoardService { //TODO custom board create
     }
 
     public Board getNewBoard() {
-        Board entity = new Board();
-        Field[][] tempBoard = createBoard(entity);
-
-        entity.setGameBoard(tempBoard);
-        //entity.setFieldList(boardToFieldList(tempBoard));
-        return entity;
+        return new Board();
     }
 
 
-    public static Field[][] createBoard(Board board) {
-
-        Field[][] gameBoard = new Field[BOARD_SIZE][BOARD_SIZE];
-        for (int x = 0; x <= GAMING_BOARD_MIDDLE; x++) {
-            for (int y = 0; y < BOARD_SIZE; y++) {
-                int opX;
-                int opY;
-                if (DROP_FIELD == y || y - x >= GAMING_BOARD_MIDDLE || DROP_FIELD == x) {
-                    opX = calculateOppositeCord(x);
-                    opY = calculateOppositeCord(y);
-                    gameBoard[y][x] = new Field(x, y, true);
-                    gameBoard[opY][opX] = new Field(opX, opY, true);
-                } else if (x < 3 || (x == 3 && y < 6 && y > 2)) {
-                    gameBoard[y][x] = new Field(B, x, y);
-                    opX = calculateOppositeCord(x);
-                    opY = calculateOppositeCord(y);
-                    gameBoard[opY][opX] = new Field(W, opX, opY);
-                } else {
-                    gameBoard[y][x] = new Field(x, y);
-                    opX = calculateOppositeCord(x);
-                    opY = calculateOppositeCord(y);
-                    gameBoard[opY][opX] = new Field(opX, opY);
-                }
-                gameBoard[y][x].setBoard(board);
-                gameBoard[opY][opX].setBoard(board);
-            }
-        }
-        return gameBoard;
-    }
+//    public static Field[][] createBoard(Board board) {
+//
+//        Field[][] gameBoard = new Field[BOARD_SIZE][BOARD_SIZE];
+//        for (int x = 0; x <= GAMING_BOARD_MIDDLE; x++) {
+//            for (int y = 0; y < BOARD_SIZE; y++) {
+//                int opX;
+//                int opY;
+//                if (DROP_FIELD == y || y - x >= GAMING_BOARD_MIDDLE || DROP_FIELD == x) {
+//                    opX = calculateOppositeCord(x);
+//                    opY = calculateOppositeCord(y);
+//                    gameBoard[y][x] = new Field(x, y, true);
+//                    gameBoard[opY][opX] = new Field(opX, opY, true);
+//                } else if (x < 3 || (x == 3 && y < 6 && y > 2)) {
+//                    gameBoard[y][x] = new Field(B, x, y);
+//                    opX = calculateOppositeCord(x);
+//                    opY = calculateOppositeCord(y);
+//                    gameBoard[opY][opX] = new Field(W, opX, opY);
+//                } else {
+//                    gameBoard[y][x] = new Field(x, y);
+//                    opX = calculateOppositeCord(x);
+//                    opY = calculateOppositeCord(y);
+//                    gameBoard[opY][opX] = new Field(opX, opY);
+//                }
+//                gameBoard[y][x].setBoard(board);
+//                gameBoard[opY][opX].setBoard(board);
+//            }
+//        }
+//        return gameBoard;
+//    }
 
     public Set<Field> boardToFieldList(Field[][] board) {
         Set<Field> result = new HashSet<>();
@@ -77,9 +71,9 @@ public class BoardService { //TODO custom board create
         }
         return result;
     }
-
+@Deprecated
     public Board makeMove(Board board, Movement move) {//TODO i'm tired need to refactor this method
-        FieldService fieldService = new FieldService();
+        FieldService fieldService = null;//new FieldService(fieldRepository);
         DirectionService dService = new DirectionService();
 
         Set<Field> fieldsToMove = move.getFields();
@@ -88,8 +82,8 @@ public class BoardService { //TODO custom board create
         int xDirection = dService.getDirection(direction, DirectionType.X);
         int yDirection = dService.getDirection(direction, DirectionType.Y);
 
-        Set<Field> tempBoard = boardToFieldList(board.getGameBoard());
-        move.getBoard().setFieldList(tempBoard);//TODO possible null refactor this method
+        Set<Field> tempBoard =null;// boardToFieldList(board.getGameBoard());
+        //move.getBoard().setFieldList(tempBoard);//TODO possible null refactor this method
         Field currentField = mService.getLastFieldInChain(move);
         Field fieldToMove = findField(currentField.getXCord() + xDirection, currentField.getYCord() + yDirection, tempBoard);
         if (fieldToMove.getBall() == null) {
@@ -115,7 +109,7 @@ public class BoardService { //TODO custom board create
             }
         }
 
-        board.setFieldList(tempBoard);
+        //board.setFieldList(tempBoard);
         return board;
     }
 
@@ -170,8 +164,6 @@ public class BoardService { //TODO custom board create
         return null;
     }
 
-    private static int calculateOppositeCord(int cord) {
-        return (BOARD_SIZE - 1) - cord;
-    }
+
 
 }

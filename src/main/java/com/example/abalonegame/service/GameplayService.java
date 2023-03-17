@@ -28,31 +28,27 @@ import static com.example.abalonegame.enums.GameStatus.IN_PROGRESS;
 
 
 @Service
-@ComponentScan(basePackages = {"lv.bogatiryov.abalongamespringapplication.repository"})
 public class GameplayService {
 
     private final GameplayRepository gameRepository;
-    @Autowired
-    private MovementService moveService;
-    @Autowired
-    private PlayerService playerService;
-    @Autowired
-    private BoardService bService;
+   // @Autowired
+    //private MovementService moveService;
+   // @Autowired
+    //private PlayerService playerService;
+   // @Autowired
+   // private BoardService bService;
 
     @Autowired
     public GameplayService(GameplayRepository gameRepository) {
         this.gameRepository = gameRepository;
     }
 
-    public Gameplay createGame(Player player, GameDTO game) {
+    public Gameplay createGame(Player player, GameDTO gameDTO, Board gameBoard) {
         Gameplay gameplay = new Gameplay();
-
-        Board gameBoard = bService.getNewBoard();
-        gameBoard.setGameplay(gameplay);
         gameplay.setPlayerOne(player);
-        gameplay.setGameType(game.getGameType());
-        gameplay.setFirstPlayerColor(game.getColor());
-        gameplay.setStatus(game.getGameType() == GameType.PvP ? IN_PROGRESS :
+        gameplay.setGameType(gameDTO.getGameType());
+        gameplay.setFirstPlayerColor(gameDTO.getColor());
+        gameplay.setStatus(gameDTO.getGameType() == GameType.PvE ? IN_PROGRESS :
                 GameStatus.WAITS_FOR_PLAYER);
         gameplay.setCreated(new Date());
         gameplay.setBoard(gameBoard);
@@ -92,7 +88,7 @@ public class GameplayService {
         Validatable<Movement> moveValidator = new MovementValidator();
         //BoardService bService = new BoardService(boardRepository);
         Board board = gameplay.getBoard();
-        Movement movement = moveService.createMove(gameplay, playerService.getLoggedUser(), moveDTO);
+        Movement movement = null;//moveService.createMove(gameplay, playerService.getLoggedUser(), moveDTO);
 
         movement.setBoard(board);
 
@@ -103,7 +99,7 @@ public class GameplayService {
 
         //Player currPlayer = gameplay.getCurrPlayer();
 
-        gameplay.setBoard(bService.makeMove(board, movement));
+        //gameplay.setBoard(bService.makeMove(board, movement));
 
         //TODO make game status validation
 /*

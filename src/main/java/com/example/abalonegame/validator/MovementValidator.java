@@ -5,7 +5,6 @@ import com.example.abalonegame.db.domain.Board;
 import com.example.abalonegame.db.domain.Direction;
 import com.example.abalonegame.db.domain.Field;
 import com.example.abalonegame.db.domain.Movement;
-import com.example.abalonegame.db.repository.GameplayRepository;
 import com.example.abalonegame.enums.DirectionType;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.IllegalMovementException;
@@ -14,9 +13,7 @@ import com.example.abalonegame.service.BoardService;
 import com.example.abalonegame.service.DirectionService;
 import com.example.abalonegame.service.FieldService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +28,7 @@ public class MovementValidator implements Validatable<Movement> {
 
     @Override
     public void validate(Movement move) {
-        FieldService fieldService = new FieldService();
+        FieldService fieldService =null;// new FieldService(fieldRepository);
         Set<Field> fieldsToMove = move.getFields();
 
         if (fieldsToMove == null || fieldsToMove.isEmpty() || fieldsToMove.size() > MAX_MOVEMENT_FIELD_AMOUNT) {
@@ -70,7 +67,8 @@ public class MovementValidator implements Validatable<Movement> {
         DirectionService dService = new DirectionService();
 
         Board board = move.getBoard();
-        Field[][] gameBoard = board.getGameBoard();
+
+        Field[][] gameBoard = null;//board.getGameBoard();
 
         Set<Field> boardSet = bService.boardToFieldList(gameBoard);
         ArrayList<Field> boardAsList = new ArrayList<>(List.copyOf(boardSet));
@@ -144,7 +142,7 @@ public class MovementValidator implements Validatable<Movement> {
         Board board = move.getBoard();
         Direction direction = move.getDirection();
 
-        Field[][] gameBoard = board.getGameBoard();
+        Field[][] gameBoard =null;// board.getGameBoard();
         Set<Field> boardAsList = bService.boardToFieldList(gameBoard);
         Set<Field> fields = move.getFields();
 

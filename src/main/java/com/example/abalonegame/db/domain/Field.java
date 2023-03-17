@@ -14,6 +14,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class Field {
+    public final static int DROP_FIELD = 0;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -21,7 +22,7 @@ public class Field {
     @OneToOne(cascade = CascadeType.ALL)
     private Ball ball;
     @JoinColumn(name = "board_id", nullable = false)
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Board board;
     @Column(name = "x",nullable = false)
     private int xCord;
