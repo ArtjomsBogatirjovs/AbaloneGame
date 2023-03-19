@@ -14,7 +14,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -43,4 +45,6 @@ public class Gameplay {
     private GameStatus status;
     @Column(name = "created", nullable = false)
     private Date created;
+    @Transient
+    private Map<Color,ArrayList<String>> tempMap; // TODO DELETE
 }

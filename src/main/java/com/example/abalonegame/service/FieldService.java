@@ -5,6 +5,8 @@ import com.example.abalonegame.db.entity.Field;
 import com.example.abalonegame.db.repository.FieldRepository;
 import com.example.abalonegame.enums.Coordinates;
 import com.example.abalonegame.enums.FieldCoordinates;
+import com.example.abalonegame.exception.ExceptionMessage;
+import com.example.abalonegame.exception.InternalException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +40,10 @@ public class FieldService {
         }
         return result;
     }
-    public ArrayList<Field> getGameBoardFields(Board board){
+    public Set<Field> getGameBoardFields(Board board){
+        if(fieldRepository.findByBoard(board).size() != 121){
+            throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
+        }
         return fieldRepository.findByBoard(board);
     }
 }

@@ -9,8 +9,8 @@
         <div class="center">
             <button id="up-left" ng-click="setDirection(-1, -1)">&#x2191;</button>
             <button id="up" ng-click="setDirection(0, -1)">&#x2191;</button>
-            <button id="up-right" ng-click="setDirection(1, -1)">&#x2191;</button>
-            <button id="down-left" ng-click="setDirection(-1, 1)">&#x2191;</button>
+            <button id="up-right" ng-click="setDirection(1, 0)">&#x2191;</button>
+            <button id="down-left" ng-click="setDirection(-1, 0)">&#x2191;</button>
             <button id="down" ng-click="setDirection(0, 1)">&#x2191;</button>
             <button id="down-right" ng-click="setDirection(1, 1)">&#x2191;</button>
         </div>
@@ -31,10 +31,10 @@
                 <tbody>
                 <tr ng-repeat="move in movesInGame">
                     <td>{{move.playerName}}</td>
-                    <td><img src="assets/ball-{{move.playerColor.toLowerCase()}}.svg" alt="Description of the image"
+                    <td><img src="assets/ball-{{move.playerColor}}.svg" alt="Description of the image"
                              width="25" height="25"></td>
                     <td>{{getFieldsCords(move.fields)}}</td>
-                    <td>{{getDirectionArrow(move.direction.x, move.direction.y)}}</td>
+                    <td>{{getDirectionArrow( move.direction.x, move.direction.y)}}</td>
                     <td>{{move.created | date:'dd-MM-yyyy HH:mm:ss'}}</td>
                 </tr>
                 </tbody>

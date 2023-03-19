@@ -2,7 +2,10 @@ package com.example.abalonegame.utils;
 
 import com.example.abalonegame.db.entity.Direction;
 import com.example.abalonegame.db.entity.Field;
+import com.example.abalonegame.enums.Color;
 import com.example.abalonegame.enums.Coordinates;
+import com.example.abalonegame.exception.ExceptionMessage;
+import com.example.abalonegame.exception.InternalException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +16,12 @@ import static com.example.abalonegame.db.entity.Board.BOARD_SIZE;
 public abstract class FieldUtil {
     public final static int MAX_NEAR_COORDINATE_DIFFERENCE = 1;
     public final static int MIN_NEAR_COORDINATE_DIFFERENCE = -1;
-    public static boolean transferBall(Field field, Field fieldToMove) { //TODO REWRITE LOGIC WITH DATABASE
-        // fieldToMove.setBall(field.getBall());
-        //field.setBall(null);
-        return true;
+
+    public static boolean transferBall(Field field, Field fieldToMove) {
+        Color tempColor = fieldToMove.isDropField() ? null : field.getColor();
+        fieldToMove.setColor(tempColor);
+        field.setColor(null);
+        return field.getColor() == null && fieldToMove.getColor() == tempColor;
     }
 
     public static boolean isRow(Set<Field> fields) {
@@ -48,6 +53,7 @@ public abstract class FieldUtil {
         }
         return true;
     }
+
     public static void sortFields(ArrayList<Field> fields) {
         fields.sort((f1, f2) -> {
             int sum1 = f1.getCordX() + f1.getCordY();
@@ -55,6 +61,7 @@ public abstract class FieldUtil {
             return Integer.compare(sum1, sum2);
         });
     }
+
     public static Field findFieldOnBoardByCoords(int x, int y, Set<Field> board) {
         return findFieldOnBoard(null, x, y, board);
     }
@@ -74,7 +81,7 @@ public abstract class FieldUtil {
             return board.stream()
                     .filter(field -> field.getCordX() == fieldToFind.getCordX())
                     .filter(field -> field.getCordY() == fieldToFind.getCordY())
-                    .filter(field -> field.getColor().equals(fieldToFind.getColor()))//getBall
+                    .filter(field -> field.getColor() == (fieldToFind.getColor()))//getBall
                     .findAny()
                     .orElse(null);
         }
@@ -89,11 +96,12 @@ public abstract class FieldUtil {
 
         return null;
     }
+
     public static Field getFirstEmptyFieldInDirection(Set<Field> board, Field startField, Direction direction) {//TODO i'm tired need to refactor this method
         Field tempField = findSameFieldOnBoard(startField, board);
 
-        int xDirection = GameUtil.getDirection(direction, Coordinates.X);
-        int yDirection = GameUtil.getDirection(direction, Coordinates.Y);
+        int xDirection = direction.getX();
+        int yDirection = direction.getY();
 
         for (int i = 0; i < BOARD_SIZE; i++) {
             tempField = findFieldOnBoardByCoords(tempField.getCordX() + xDirection, tempField.getCordY() + yDirection, board);
@@ -103,9 +111,13 @@ public abstract class FieldUtil {
         }
         return null;
     }
+
     public static Field getLastFieldInChain(Direction direction, Set<Field> fields) {
-        int dirX = GameUtil.getDirection(direction, Coordinates.X) * -1;
-        int dirY = GameUtil.getDirection(direction, Coordinates.Y) * -1;
+        if (!isRow(fields) && !GameUtil.isDirectionLikeRow(fields, direction)) {
+            throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
+        }
+        int dirX = direction.getX() * -1;
+        int dirY = direction.getY() * -1;
 
         for (Field field : fields) {
             if (FieldUtil.findFieldOnBoardByCoords(field.getCordX() + dirX, field.getCordY() + dirY, fields) == null) {

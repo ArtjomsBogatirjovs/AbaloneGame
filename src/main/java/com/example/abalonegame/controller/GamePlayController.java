@@ -66,6 +66,8 @@ public class GamePlayController {
     @RequestMapping(value = "/{id}")
     public Gameplay getGameProperties(@PathVariable Long id) {
         httpSession.setAttribute("gameId", id);
-        return gameplayService.getGameplay(id);
+        Gameplay gameplay = gameplayService.getGameplay(id);
+        gameplay.setTempMap(BoardUtil.convertGameBoardToResponse(fieldService.getGameBoardFields(gameplay.getBoard()))); //TODO DELETE
+        return gameplay;
     }
 }

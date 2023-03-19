@@ -84,8 +84,6 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
     function (rootScope, routeParams, scope, http) {
         canvas = document.getElementById("canvas");
         ctx = canvas.getContext("2d");
-
-        createGame();
         var gameStatus;
         getInitialData()
 
@@ -97,6 +95,8 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         function getInitialData() {
             http.get('/game/' + routeParams.id).then(function (data) {
                 scope.gameProperties = data.data;
+                gameState = data.data.tempMap; // TODO DELETE
+                createGame()
                 gameStatus = scope.gameProperties.status;
                 getMoveHistory();
             }).catch(function (data, status, headers, config) {
@@ -147,6 +147,7 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
                     clickedField = key;
                     updateSelectedFields(key);
                     drawSelectedField()
+                    console.log(clickedField);
                     break;
                 }
             }
@@ -173,12 +174,15 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
 
         function makePlayerMove() {
             var parameters = {'fieldCords' : selectedField, 'direction': direction}
-            http.get('/move/turn').then(function () {
+            //http.get('/move/turn').then(function () {
                 http.post("/move/create", parameters, {
                     headers: {
                         'Content-Type': 'application/json; charset=UTF-8'
                     }
-                }).then(function () {
+                }).then(function (data) {
+                    gameState = data.data;
+                    createGame(data.data);
+                    selectedField = [];
                     getMoveHistory().then(function () {
                         var gameStatus = scope.movesInGame[scope.movesInGame.length - 1].status;
                         if (gameStatus === 'IN_PROGRESS') {
@@ -189,12 +193,11 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
                     });
 
                 }).catch(function (data, status, headers, config) {
-                    scope.errorMessage = "Can't send the move"
-                    alert(scope.errorMessage)
+                    Swal.fire(data.data.message)
                 });
-            }).catch(function (data) {
-                Swal.fire(data.data.message)
-            })
+            //}).catch(function (data) {
+           //     Swal.fire(data.data.message)
+            //})
         }
         const drawSelectedField = () => {
             for (const selectedFieldElement of selectedField) {
@@ -219,6 +222,7 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         }
 
         scope.setDirection = function (dirX = 0, dirY = 0) {
+
             direction.x = dirX;
             direction.y = dirY;
             makePlayerMove();
@@ -233,18 +237,19 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         }
 
         scope.getDirectionArrow = function (x,y){
+            console.log(x + "    " +y)
             if(x === -1 && y === -1){
-                return "\u2199";
-            } else if (x === 0 && y === -1){
-                return "\u2193";
-            }else if (x === 1 && y === -1){
-                return "\u2198";
-            }else if (x === -1 && y === 1){
                 return "\u2196";
+            } else if (x === 1 && y === 1){
+                return "\u2198";
+            }else if (x === 0 && y === -1){
+                return "\u2199";
             }else if (x === 0 && y === 1){
-                return "\u2191";
-            }else if (x === 1 && y === 1){
                 return "\u2197";
+            }else if (x === -1 && y === 0){
+                return "\u2191";
+            }else if (x === 1 && y === 0){
+                return "\u2193";
             }
         }
     }

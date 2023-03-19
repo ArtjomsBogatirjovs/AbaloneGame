@@ -11,7 +11,7 @@ const board = {
                 if (['i', 'g', 'h', 'f'].includes(key)) {
                     index = 9 - i;
                 } else {
-                    index = i + 1;
+                    index = value - i;
                 }
                 hexagons[`${key}${index}`] = {
                     x: keyIndex * hexagonWidth,
@@ -27,9 +27,11 @@ const board = {
     },
 
     drawGameState: function (boardIds) {
+        console.log(boardIds)
         if (boardIds === undefined) {
             boardIds = gameState;
         }
+        console.log(boardIds)
         for (const [key, value] of Object.entries(boardIds)) {
             value.forEach((field) => {
                 const img = new Image();

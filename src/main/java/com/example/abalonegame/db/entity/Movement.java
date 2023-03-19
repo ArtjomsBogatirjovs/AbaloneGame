@@ -26,7 +26,7 @@ public class Movement {
     @OneToOne(cascade = CascadeType.ALL)
     private Board board;
     @ManyToOne
-    @JoinColumn(name = "player_id", nullable = true)
+    @JoinColumn(name = "player_id", nullable = false)
     private Player player;
     @Column(name = "created", nullable = false)
     private Date created;

@@ -1,18 +1,31 @@
 package com.example.abalonegame.utils;
 
 
-import com.example.abalonegame.db.entity.Board;
-import com.example.abalonegame.db.entity.Direction;
+import com.example.abalonegame.db.entity.*;
+import com.example.abalonegame.enums.Color;
 import com.example.abalonegame.enums.Coordinates;
-import com.example.abalonegame.enums.Directions;
 import com.example.abalonegame.enums.FieldCoordinates;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.InternalException;
+import com.example.abalonegame.exception.ValidateException;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.*;
 
 public abstract class GameUtil {
+    public static boolean isPlayerTurn(Gameplay currentGameplay, Player currentPlayer, Movement lastMovement) {
+        if (lastMovement == null) {
+            if (currentPlayer.equals(currentGameplay.getPlayerOne())) {
+                return true;
+            } else {
+                throw new ValidateException(ExceptionMessage.NOT_YOUR_TURN);
+            }
+        } else if (lastMovement.getPlayer().equals(currentPlayer)) {
+            throw new ValidateException(ExceptionMessage.NOT_YOUR_TURN);
+        }
+        return !lastMovement.getPlayer().equals(currentPlayer);
+    }
+
     public static final int COORDINATE_VALUE_LENGTH = 2;
 
     public static int calculateOppositeCord(int cord) {
@@ -66,18 +79,40 @@ public abstract class GameUtil {
         return result;
     }
 
-
-    public static int getDirection(Direction direction, Coordinates type) {
-        int result = Directions.NULL.getDirection();
-        Integer tempDir = type.equals(Coordinates.X) ? direction.getX() : direction.getY();
-        if (tempDir != null) {
-            if (tempDir == Directions.TRUE.getDirection()) {
-                result = Directions.TRUE.getDirection();
-            } else {
-                result = Directions.FALSE.getDirection();
+    public static boolean isDirectionLikeRow(Set<Field> fields, Direction direction) {
+        if (fields.size() < MovementUtil.MIN_BALLS_TO_SUMITO) { //TODO move constant
+            return true;
+        }
+        int xDir = direction.getX();
+        int yDir = direction.getY();
+        for (Field field : fields) {
+            if (FieldUtil.findFieldOnBoardByCoords(field.getCordX() + xDir, field.getCordY() + yDir, fields) == null
+                    && FieldUtil.findFieldOnBoardByCoords(field.getCordX() - xDir, field.getCordY() - yDir, fields) == null) {
+                return false;
             }
         }
-        return result;
+        return true;
+    }
+
+    public static Color getPlayerColor(Gameplay gameplay, Player player) {
+        if (player.equals(gameplay.getPlayerOne())) {
+            return gameplay.getFirstPlayerColor();
+        } else {
+            return gameplay.getFirstPlayerColor() == Color.BLACK ? Color.WHITE : Color.BLACK;
+        }
+    }
+
+    public static String fieldCordToString(Field field) {
+        String result = "";
+        int x = field.getCordX();
+        int y = field.getCordY();
+        for (FieldCoordinates fc : FieldCoordinates.values()) {
+            if (fc.getValue().equals(x)) {
+                result += fc.getStringValue().toLowerCase();
+                break;
+            }
+        }
+        return result + y;
     }
 }
 

@@ -1,12 +1,16 @@
 package com.example.abalonegame.utils;
 
 import com.example.abalonegame.db.entity.Board;
+import com.example.abalonegame.db.entity.Direction;
 import com.example.abalonegame.db.entity.Field;
+import com.example.abalonegame.db.entity.Movement;
 import com.example.abalonegame.enums.Color;
+import com.example.abalonegame.enums.Coordinates;
+import com.example.abalonegame.exception.ExceptionMessage;
+import com.example.abalonegame.exception.InternalException;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.abalonegame.db.entity.Board.BOARD_SIZE;
 import static com.example.abalonegame.db.entity.Board.GAMING_BOARD_MIDDLE;
@@ -42,6 +46,7 @@ public abstract class BoardUtil {
         }
         return gameBoard;
     }
+
     public static Set<Field> boardToFieldList(Field[][] board) {
         Set<Field> result = new HashSet<>();
 
@@ -49,5 +54,66 @@ public abstract class BoardUtil {
             result.addAll(Arrays.asList(fieldArray));
         }
         return result;
+    }
+
+    public static Set<Field> makeMove(Set<Field> gameBoard, Movement move) {
+        Set<Field> fieldsToMove = move.getFields();
+        Direction direction = move.getDirection();
+
+        if (fieldsToMove == null || fieldsToMove.isEmpty() || direction == null) {
+            throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
+        }
+
+        int xDirection = direction.getX();
+        int yDirection = direction.getY();
+
+        Field lastFieldInChain = FieldUtil.getLastFieldInChain(direction, fieldsToMove);
+
+        Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(lastFieldInChain.getCordX() + xDirection, lastFieldInChain.getCordY() + yDirection, gameBoard);
+        if (fieldToMove.getColor() == null) { //getBall
+            for (Field f : fieldsToMove) {
+                Field tempField = FieldUtil.findSameFieldOnBoard(f, gameBoard);
+                fieldToMove = FieldUtil.findFieldOnBoardByCoords(f.getCordX() + xDirection, f.getCordY() + yDirection, gameBoard);
+                if (!FieldUtil.transferBall(tempField, fieldToMove)) {
+                    throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
+                }
+            }
+        }
+        if (fieldsToMove.contains(fieldToMove)) {
+            Field firstEmptyFieldInDirection = FieldUtil.getFirstEmptyFieldInDirection(gameBoard, lastFieldInChain, direction);
+            xDirection *= -1;
+            yDirection *= -1;
+            for (int i = 0; i < BOARD_SIZE; i++) {
+                fieldToMove = FieldUtil.findFieldOnBoardByCoords(firstEmptyFieldInDirection.getCordX() + xDirection, firstEmptyFieldInDirection.getCordY() + yDirection, gameBoard);
+                if (FieldUtil.getLastFieldInChain(direction, fieldsToMove).equals(fieldToMove)) {
+                    if (FieldUtil.transferBall(fieldToMove, firstEmptyFieldInDirection)) {
+                        return gameBoard;
+                    } else {
+                        throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
+                   }
+                }
+                FieldUtil.transferBall(fieldToMove, firstEmptyFieldInDirection);
+                firstEmptyFieldInDirection = fieldToMove;
+            }
+        }
+        return gameBoard;
+    }
+
+    public static Map<Color, ArrayList<String>> convertGameBoardToResponse(Set<Field> gameBoard) {
+        Map<Color, ArrayList<String>> response = new HashMap<>();
+        response.put(Color.BLACK, new ArrayList<>());
+        response.put(Color.WHITE, new ArrayList<>());
+
+        Set<Field> fieldWithBalls = gameBoard.stream()
+                .filter(field -> field.getColor() != null)
+                .collect(Collectors.toSet());
+        for (Field field : fieldWithBalls) {
+            if (field.getColor().equals(Color.BLACK)) {
+                response.get(Color.BLACK).add(GameUtil.fieldCordToString(field));
+            } else {
+                response.get(Color.WHITE).add(GameUtil.fieldCordToString(field));
+            }
+        }
+        return response;
     }
 }

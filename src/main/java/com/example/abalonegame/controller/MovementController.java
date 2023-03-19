@@ -3,12 +3,16 @@ package com.example.abalonegame.controller;
 import com.example.abalonegame.db.entity.*;
 import com.example.abalonegame.dto.CreateMoveDTO;
 import com.example.abalonegame.dto.MoveDTO;
+import com.example.abalonegame.enums.Color;
 import com.example.abalonegame.enums.Coordinates;
 import com.example.abalonegame.enums.FieldCoordinates;
 import com.example.abalonegame.service.*;
+import com.example.abalonegame.utils.BoardUtil;
 import com.example.abalonegame.utils.GameUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,22 +38,25 @@ public class MovementController {
     MovementService movementService;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public Movement createMove(@RequestBody CreateMoveDTO createMoveDTO) {//TODO validate if list<0 or list>3,no duplicated value
+    public Map<Color, ArrayList<String>> createMove(@RequestBody CreateMoveDTO createMoveDTO) {//TODO validate if list<0 or list>3,no duplicated value
         Long gameId = (Long) httpSession.getAttribute("gameId");
         Gameplay gameplay = gameplayService.getGameplay(gameId);
         Board board = gameplay.getBoard();
         Player currentPlayer = playerService.getLoggedUser();
+        Color playerColor = GameUtil.getPlayerColor(gameplay, currentPlayer);
 
         ArrayList<Map<Coordinates, FieldCoordinates>> tempFieldCords = GameUtil.resolveCoordinateList(createMoveDTO.getFieldCords());
-        ArrayList<Field> fieldsToMove = fieldService.findFieldsFromMaps(tempFieldCords,board);
-        ArrayList<Field> gameBoardFields = fieldService.getGameBoardFields(board);
+        ArrayList<Field> fieldsToMove = fieldService.findFieldsFromMaps(tempFieldCords, board);
+        Set<Field> gameBoardFields = fieldService.getGameBoardFields(board);
 
         Movement movement = movementService.createMove(gameplay, currentPlayer, createMoveDTO, new HashSet<>(fieldsToMove));
-
+        movementService.validateAndSave(movement, gameBoardFields);
+        gameBoardFields = BoardUtil.makeMove(gameBoardFields, movement);
+        fieldService.saveGameBoardFields(gameBoardFields);
         //gameplayService.updateGameStatus(gameplayService.getGameplay(gameId), movementService.checkCurrentGameStatus(gameplay));
-
-        return movement;
+        return BoardUtil.convertGameBoardToResponse(gameBoardFields);
     }
+
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<MoveDTO> getMovesInGame() {
         Long gameId = (Long) httpSession.getAttribute("gameId");
@@ -60,10 +67,13 @@ public class MovementController {
     public boolean isPlayerTurn() {
         Long gameId = (Long) httpSession.getAttribute("gameId");
         Gameplay currentGame = gameplayService.getGameplay(gameId);
+        Board currentBoard = currentGame.getBoard();
+        Movement lastMovement = movementService.getLastMovement(currentBoard);
         Player currentPlayer = playerService.getLoggedUser();
-        return movementService.isPlayerTurn(
+        return GameUtil.isPlayerTurn(
                 currentGame,
-                currentPlayer
+                currentPlayer,
+                lastMovement
         );
     }
 }
