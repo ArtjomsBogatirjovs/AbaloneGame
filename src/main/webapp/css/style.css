@@ -1,0 +1,19 @@
+body{
+    background: #212121;
+    color: #666;
+    margin: 0 auto;
+    text-align: center;
+}
+h1{
+    text-align: center;
+    color: #fff;
+}
+
+#box{
+    width: 450px;
+    overflow: auto;
+    margin: 0 auto;
+    background: #666;
+    padding-bottom: 40px;
+    border-radius: 10px;
+}

@@ -1,0 +1,47 @@
+<head>
+    <title>Gameplay</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="css/game-board.css">
+</head>
+
+<div class="row">
+    <div class="col-md-6">
+        <p>Select a direction by clicking on the coordinate button:</p>
+        <div class="center">
+            <button id="up-left" ng-click="setDirection(-1, -1)">&#x2191;</button>
+            <button id="up" ng-click="setDirection(0, -1)">&#x2191;</button>
+            <button id="up-right" ng-click="setDirection(1, -1)">&#x2191;</button>
+            <button id="down-left" ng-click="setDirection(-1, 1)">&#x2191;</button>
+            <button id="down" ng-click="setDirection(0, 1)">&#x2191;</button>
+            <button id="down-right" ng-click="setDirection(1, 1)">&#x2191;</button>
+        </div>
+        <canvas id="canvas" width="950" height="950"></canvas>
+    </div>
+
+    <div class="col-md-6">
+        <div>
+            <table class="table table-hover table-striped table-condensed" ng-show="movesInGame.length">
+                <h2 class="lead">History of moves in the game</h2>
+                <thead>
+                <td>Player</td>
+                <td>Ball</td>
+                <td>Fields</td>
+                <td>Direction</td>
+                <td>Move created</td>
+                </thead>
+                <tbody>
+                <tr ng-repeat="move in movesInGame">
+                    <td>{{move.playerName}}</td>
+                    <td><img src="assets/ball-{{move.playerColor.toLowerCase()}}.svg" alt="Description of the image"
+                             width="25" height="25"></td>
+                    <td>{{getFieldsCords(move.fields)}}</td>
+                    <td>{{getDirectionArrow(move.direction.x, move.direction.y)}}</td>
+                    <td>{{move.created | date:'dd-MM-yyyy HH:mm:ss'}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <div ng-show="!movesInGame.length">
+                No moves yet.
+            </div>
+        </div>
+    </div>
+</div>
