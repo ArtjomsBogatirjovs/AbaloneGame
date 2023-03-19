@@ -1,10 +1,10 @@
 package com.example.abalonegame.service;
 
 
-import com.example.abalonegame.db.domain.Board;
-import com.example.abalonegame.db.domain.Gameplay;
-import com.example.abalonegame.db.domain.Movement;
-import com.example.abalonegame.db.domain.Player;
+import com.example.abalonegame.db.entity.Board;
+import com.example.abalonegame.db.entity.Gameplay;
+import com.example.abalonegame.db.entity.Movement;
+import com.example.abalonegame.db.entity.Player;
 import com.example.abalonegame.db.repository.GameplayRepository;
 import com.example.abalonegame.dto.GameDTO;
 import com.example.abalonegame.dto.MoveDTO;
@@ -19,24 +19,15 @@ import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.example.abalonegame.enums.GameStatus.FINISHED;
-import static com.example.abalonegame.enums.GameStatus.IN_PROGRESS;
-
 
 @Service
 public class GameplayService {
 
     private final GameplayRepository gameplayRepository;
-    // @Autowired
-    //private MovementService moveService;
-    // @Autowired
-    //private PlayerService playerService;
-    // @Autowired
-    // private BoardService bService;
 
     @Autowired
     public GameplayService(GameplayRepository gameRepository) {
@@ -48,7 +39,7 @@ public class GameplayService {
         gameplay.setPlayerOne(player);
         gameplay.setGameType(gameDTO.getGameType());
         gameplay.setFirstPlayerColor(gameDTO.getColor());
-        gameplay.setStatus(gameDTO.getGameType() == GameType.PvE ? IN_PROGRESS :
+        gameplay.setStatus(gameDTO.getGameType() == GameType.PvE ? GameStatus.IN_PROGRESS :
                 GameStatus.WAITS_FOR_PLAYER);
         gameplay.setCreated(new Date());
         gameplay.setBoard(gameBoard);
@@ -57,9 +48,9 @@ public class GameplayService {
     }
 
     public Gameplay connectGame(Player player, GameDTO gameDTO) {
-        Gameplay gameplay =  getGameplay(gameDTO.getId());
+        Gameplay gameplay = getGameplay(gameDTO.getId());
         gameplay.setPlayerTwo(player);
-        gameplay.setStatus(IN_PROGRESS);
+        gameplay.setStatus(GameStatus.IN_PROGRESS);
         gameplayRepository.save(gameplay);
         return gameplay;
     }
@@ -67,17 +58,18 @@ public class GameplayService {
     public List<Gameplay> getGamesToJoin(Player player) {
         return gameplayRepository.findByGameTypeAndStatus(GameType.PvP, GameStatus.WAITS_FOR_PLAYER)
                 .stream()
-                .filter(gameplay -> gameplay.getPlayerOne() != player)
+                .filter(gameplay -> !gameplay.getPlayerOne().equals(player))
                 .collect(Collectors.toList());
     }
 
     public List<Gameplay> getPlayerGames(Player player) {
-        return gameplayRepository.findByStatus(GameStatus.IN_PROGRESS)
+        return gameplayRepository.findByStatusIn(new ArrayList<>(List.of(GameStatus.IN_PROGRESS,GameStatus.WAITS_FOR_PLAYER)))
                 .stream()
-                .filter(gameplay -> gameplay.getPlayerOne() == player)
+                .filter(gameplay -> player.equals(gameplay.getPlayerOne()) || player.equals(gameplay.getPlayerTwo()))
                 .collect(Collectors.toList());
     }
 
+    @Deprecated
     public Gameplay connectToGame(Player player, GameDTO gameDTO) throws NotFoundException, InvalidGameException {
         Gameplay gameplay = getGameplay(gameDTO.getId());
 
@@ -97,7 +89,7 @@ public class GameplayService {
         //ArrayList<Player> playersOrdered = chooseFirst(gameplay.getPlayers());
         //gameplay.setPlayers(playersOrdered);
         //gameplay.setCurrPlayer(player);
-        gameplay.setStatus(IN_PROGRESS);
+        gameplay.setStatus(GameStatus.IN_PROGRESS);
         return gameplay;
     }
 
@@ -150,18 +142,9 @@ public class GameplayService {
             throw new InvalidGameException(ExceptionMessage.ONLY_ONE_PLAYER.getMessage());
         }
 
-        if (gameplay.getStatus().equals(FINISHED)) {
+        if (gameplay.getStatus().equals(GameStatus.FINISHED)) {
             throw new InvalidGameException(ExceptionMessage.FINISHED.getMessage());
         }
-    }
-
-
-    private Player switchPlayer(List<Player> players, Player current_player) {
-
-        if (players.get(0).equals(current_player)) {
-            return players.get(1);
-        }
-        return players.get(0);
     }
 
     private boolean checkGameFinish(String[][] board, Player current_player) {

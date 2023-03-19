@@ -1,14 +1,12 @@
 package com.example.abalonegame.dto;
 
-import com.example.abalonegame.db.domain.Direction;
-import com.example.abalonegame.db.domain.Field;
-import com.sun.istack.NotNull;
+import com.example.abalonegame.db.entity.Direction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.ArrayList;
 
 
 @Getter
@@ -16,8 +14,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateMoveDTO {
-    @NotNull
-    Set<Field> fields;
-    @NotNull
+    ArrayList<String> fieldCords;
     Direction direction;
 }

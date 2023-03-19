@@ -1,7 +1,7 @@
 package com.example.abalonegame.service;
 
 
-import com.example.abalonegame.db.domain.Player;
+import com.example.abalonegame.db.entity.Player;
 import com.example.abalonegame.db.repository.PlayerRepository;
 import com.example.abalonegame.dto.PlayerDTO;
 import com.example.abalonegame.security.ContextUser;

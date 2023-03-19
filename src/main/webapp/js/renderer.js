@@ -1,12 +1,9 @@
-// drawing methods
 let canvas;
 let ctx;
 
-let gameScale = window.innerHeight / 1080;
-
 const board = {
     drawBoard: function () {
-        const color = "#a8a098";
+        let color = boardColor;
         let keyIndex = 0;
         let index;
         for (const [key, value] of Object.entries(fieldDefinition)) {
@@ -30,13 +27,13 @@ const board = {
     },
 
     drawGameState: function (boardIds) {
-        if (boardIds === null) {
+        if (boardIds === undefined) {
             boardIds = gameState;
         }
         for (const [key, value] of Object.entries(boardIds)) {
             value.forEach((field) => {
                 const img = new Image();
-                img.src = `./js/assets/ball-${key}.svg`;
+                img.src = `./assets/ball-${key}.svg`;
                 img.onload = () => {
                     ctx.drawImage(
                         img,
@@ -54,25 +51,14 @@ const board = {
         relativeX += hexagonWidth * 1.85;
         relativeY += hexagonHeight / 2;
         ctx.beginPath();
-        ctx.moveTo(relativeX + 0, relativeY + 0);
-        ctx.lineTo(relativeX + 1 * scale, relativeY + 0);
-        ctx.lineTo(relativeX + 1.5 * scale, relativeY + hexagonHeight / 2);
-        ctx.lineTo(relativeX + 1 * scale, relativeY + hexagonHeight);
-        ctx.lineTo(relativeX + 0, relativeY + hexagonHeight);
-        ctx.lineTo(relativeX - 0.5 * scale, relativeY + hexagonHeight / 2);
+        ctx.moveTo(relativeX, relativeY);
+        ctx.lineTo(relativeX  + scale, relativeY);
+         ctx.lineTo(relativeX + 1.5 * scale, relativeY + hexagonHeight / 2);
+         ctx.lineTo(relativeX + 1 * scale, relativeY + hexagonHeight);
+         ctx.lineTo(relativeX + 0, relativeY + hexagonHeight);
+         ctx.lineTo(relativeX - 0.5 * scale, relativeY + hexagonHeight / 2);
         ctx.closePath();
         ctx.fill();
     }
 }
 
-// handle game events
-const drawSelectedField = () => {
-    const selectedHexagon = hexagons[selectedField];
-    drawHexagon(selectedHexagon.x, selectedHexagon.y, "#296600");
-    drawGameState();
-    possibleActions.forEach((actionField) => {
-        const possibleActionHexagon = hexagons[actionField];
-        drawHexagon(possibleActionHexagon.x, possibleActionHexagon.y, "#BA110C");
-        drawGameState();
-    });
-};

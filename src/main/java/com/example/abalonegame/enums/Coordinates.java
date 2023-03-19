@@ -1,5 +1,5 @@
 package com.example.abalonegame.enums;
 
-public enum DirectionType {
+public enum Coordinates {
     X,Y;
 }

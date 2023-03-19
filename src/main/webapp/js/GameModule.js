@@ -3,37 +3,31 @@ var gameModule = angular.module('gameModule', []);
 gameModule.controller('newGameController', ['$rootScope', '$scope', '$http', '$location',
 
     function (rootScope, scope, http, location) {
-
         rootScope.gameId = null;
         scope.newGameData = null;
-
         scope.newGameOptions = {
             availableColors: [
                 {name: 'WHITE'},
                 {name: 'BLACK'}
             ],
-            selectedPiece: {name: 'BLACK'},
+            selectedColor: {name: 'BLACK'},
             availableGameTypes: [
                 {name: 'PvP'},
                 {name: 'PvE'}
             ],
             selectedBoardDimension: {name: 'PvE'}
         };
-
         scope.createNewGame = function () {
-
             var data = scope.newGameData;
             var params = JSON.stringify(data);
-
-
             http.post("/game/create", params, {
                 headers: {
                     'Content-Type': 'application/json; charset=UTF-8'
                 }
-            }).success(function (data, status, headers, config) {
-                rootScope.gameId = data.id;
+            }).then(function (data, status, headers, config) {
+                rootScope.gameId = data.data.id;
                 location.path('/game/' + rootScope.gameId);
-            }).error(function (data, status, headers, config) {
+            }).catch(function (data, status, headers, config) {
                 location.path('/player/panel');
             });
         }
@@ -46,9 +40,9 @@ gameModule.controller('gamesToJoinController', ['$scope', '$http', '$location',
 
         scope.gamesToJoin = [];
 
-        http.get('/game/list').success(function (data) {
-            scope.gamesToJoin = data;
-        }).error(function (data, status, headers, config) {
+        http.get('/game/list').then(function (data) {
+            scope.gamesToJoin = data.data;
+        }).catch(function (data, status, headers, config) {
             location.path('/player/panel');
         });
 
@@ -61,32 +55,28 @@ gameModule.controller('gamesToJoinController', ['$scope', '$http', '$location',
                 headers: {
                     'Content-Type': 'application/json; charset=UTF-8'
                 }
-            }).success(function (data) {
-                location.path('/game/' + data.id);
-            }).error(function (data, status, headers, config) {
+            }).then(function (data) {
+                location.path('/game/' + data.data.id);
+            }).catch(function (data, status, headers, config) {
                 location.path('/player/panel');
             });
         }
-
     }]);
 
 
 gameModule.controller('playerGamesController', ['$scope', '$http', '$location', '$routeParams',
     function (scope, http, location, routeParams) {
-
         scope.playerGames = [];
 
-        http.get('/game/player/list').success(function (data) {
-            scope.playerGames = data;
-        }).error(function (data, status, headers, config) {
+        http.get('/game/player/list').then(function (data) {
+            scope.playerGames = data.data;
+        }).catch(function (data, status, headers, config) {
             location.path('/player/panel');
         });
 
         scope.loadGame = function (id) {
-            console.log(id);
             location.path('/game/' + id);
         }
-
     }]);
 
 
@@ -94,72 +84,10 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
     function (rootScope, routeParams, scope, http) {
         canvas = document.getElementById("canvas");
         ctx = canvas.getContext("2d");
-        const boardIdsMap = {
-            white: ["i5", "i6", "i7", "i8", "i9", "h4", "h5", "h6", "h7", "h8", "h9", "g5", "g6", "g7"],
-            black: ["a1", "a2","a3", "a4", "a5", "b1","b2", "b3", "b4", "b5", "b6", "c3", "c4", "c5"],
-        };
-        createGame(boardIdsMap);
+
+        createGame();
         var gameStatus;
         getInitialData()
-        canvas.addEventListener("click", (event) => {
-            const clickedField = [];
-            for (const [key, value] of Object.entries(hexagons)) {
-
-                if (isInsideHexagon(event.offsetX,event.offsetY,value.x + 160,value.y + 94)) {
-                    clickedField.push(key);
-                }
-            }
-            //if (clickedField.length === 1) {
-                findClickedPiece(null, clickedField[0]);
-            console.log(clickedField)
-            //}
-        });
-        function isInsideHexagon(clickX, clickY,centerX, centerY) {
-            const distanceX = Math.abs(clickX - centerX);
-            const distanceY = Math.abs(clickY - centerY);
-            // console.log("Click on X - " + clickX)
-            // console.log("Click on Y - " + clickY)
-            // console.log("Click on CenterX - " + centerX)
-            // console.log("Click on CenterY - " + centerY)
-            // console.log("Click on distanceX - " + distanceX)
-            // console.log("Click on distanceY - " + distanceY)
-            if (distanceX > scale || distanceY > scale) {
-                return false;
-            }
-
-            if (distanceX + distanceY <= scale) {
-                return true;
-            }
-
-            const distanceToCorner = Math.sqrt(
-                Math.pow(distanceY- scale / 2, 2) +
-                Math.pow(distanceX - scale * Math.sqrt(3) / 2, 2)
-            );
-
-            return distanceToCorner <= scale / 2;
-        }
-        const findClickedPiece = (player, clickedField) => {
-            console.log(clickedField);
-            if (!selectedField) {
-                for (const [key, value] of Object.entries(gameState)) {
-                    value.forEach((field) => {
-                        if (field === clickedField) {
-                            console.log(clickedField);
-                            getPossibleMoves(key, clickedField);
-                        }
-                    });
-                }
-            } else {
-                for (const [key, value] of Object.entries(gameState)) {
-                    value.forEach((field) => {
-                        if (field === selectedField) {
-                            console.log(clickedField);
-                            handleMove(clickedField, key, !localPlay);
-                        }
-                    });
-                }
-            }
-        };
 
         function createGame(boardIdsMap) {
             board.drawBoard();
@@ -167,37 +95,24 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         }
 
         function getInitialData() {
-
-            http.get('/game/' + routeParams.id).success(function (data) {
-                scope.gameProperties = data;
-                gameStatus = scope.gameProperties.gameStatus;
+            http.get('/game/' + routeParams.id).then(function (data) {
+                scope.gameProperties = data.data;
+                gameStatus = scope.gameProperties.status;
                 getMoveHistory();
-            }).error(function (data, status, headers, config) {
+            }).catch(function (data, status, headers, config) {
                 scope.errorMessage = "Failed do load game properties";
+                console.log(scope.errorMessage);
             });
         }
 
         function getMoveHistory() {
             scope.movesInGame = [];
 
-            return http.get('/move/list').success(function (data) {
-                scope.movesInGame = data;
-                scope.playerMoves = [];
-
-                //paint the board with positions from the retrieved moves
-                angular.forEach(scope.movesInGame, function (move) {
-                    scope.rows[move.boardRow - 1][move.boardColumn - 1].letter = move.playerPieceCode;
-                });
-            }).error(function (data, status, headers, config) {
+            return http.get('/move/list').then(function (data) {
+                scope.movesInGame = data.data;
+            }).catch(function (data, status, headers, config) {
                 scope.errorMessage = "Failed to load moves in game"
-            });
-        }
-
-        function checkPlayerTurn() {
-            return http.get('/move/turn').success(function (data) {
-                scope.playerTurn = data;
-            }).error(function (data, status, headers, config) {
-                scope.errorMessage = "Failed to get the player turn"
+                console.log(scope.errorMessage);
             });
         }
 
@@ -207,15 +122,15 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
 
             // COMPUTER IS A SECOND PLAYER
             if (!scope.gameProperties.secondPlayer) {
-                http.get("/move/autocreate").success(function (data, status, headers, config) {
+                http.get("/move/autocreate").then(function (data, status, headers, config) {
                     scope.nextMoveData = data;
-                    getMoveHistory().success(function () {
-                        var gameStatus = scope.movesInGame[scope.movesInGame.length - 1].gameStatus;
+                    getMoveHistory().then(function () {
+                        var gameStatus = scope.movesInGame[scope.movesInGame.length - 1].status;
                         if (gameStatus !== 'IN_PROGRESS') {
                             alert(gameStatus)
                         }
                     });
-                }).error(function (data, status, headers, config) {
+                }).catch(function (data, status, headers, config) {
                     scope.errorMessage = "Can't send the move"
                 });
 
@@ -225,77 +140,114 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
             }
         }
 
-        function checkIfBoardCellAvailable(boardRow, boardColumn) {
-
-            for (var i = 0; i < scope.movesInGame.length; i++) {
-                var move = scope.movesInGame[i];
-                if (move.boardColumn === boardColumn && move.boardRow === boardRow) {
-                    return false;
+        canvas.addEventListener("click", (event) => {
+            let clickedField;
+            for (const [key, value] of Object.entries(hexagons)) {
+                if (isInsideHexagon(event.offsetX, event.offsetY, value.x + 160, value.y + 91)) {
+                    clickedField = key;
+                    updateSelectedFields(key);
+                    drawSelectedField()
+                    break;
                 }
             }
-            return true;
-        }
-
-        scope.rows = [
-            [
-                {'id': '11', 'letter': '', 'class': 'box'},
-                {'id': '12', 'letter': '', 'class': 'box'},
-                {'id': '13', 'letter': '', 'class': 'box'}
-            ],
-            [
-                {'id': '21', 'letter': '', 'class': 'box'},
-                {'id': '22', 'letter': '', 'class': 'box'},
-                {'id': '23', 'letter': '', 'class': 'box'}
-            ],
-            [
-                {'id': '31', 'letter': '', 'class': 'box'},
-                {'id': '32', 'letter': '', 'class': 'box'},
-                {'id': '33', 'letter': '', 'class': 'box'}
-            ]
-        ];
-
-        angular.forEach(scope.rows, function (row) {
-            row[0].letter = row[1].letter = row[2].letter = '';
-            row[0].class = row[1].class = row[2].class = 'box';
         });
 
-        scope.markPlayerMove = function (column) {
-            checkPlayerTurn().success(function () {
+        function isInsideHexagon(clickX, clickY, centerX, centerY) {
+            const distanceX = Math.abs(clickX - centerX);
+            const distanceY = Math.abs(clickY - centerY);
+            if (distanceX > scale || distanceY > scale) {
+                return false;
+            }
 
-                var boardRow = parseInt(column.id.charAt(0));
-                var boardColumn = parseInt(column.id.charAt(1));
-                var params = {'boardRow': boardRow, 'boardColumn': boardColumn}
+            if (distanceX + distanceY <= scale) {
+                return true;
+            }
 
-                if (checkIfBoardCellAvailable(boardRow, boardColumn) === true) {
-                    // if player has a turn
-                    if (scope.playerTurn === true) {
+            const distanceToCorner = Math.sqrt(
+                Math.pow(distanceY - scale / 2, 2) +
+                Math.pow(distanceX - scale * Math.sqrt(3) / 2, 2)
+            );
 
-                        http.post("/move/create", params, {
-                            headers: {
-                                'Content-Type': 'application/json; charset=UTF-8'
-                            }
-                        }).success(function () {
-                            getMoveHistory().success(function () {
+            return distanceToCorner <= scale / 2;
+        }
 
-                                var gameStatus = scope.movesInGame[scope.movesInGame.length - 1].gameStatus;
-                                if (gameStatus === 'IN_PROGRESS') {
-                                    getNextMove();
-                                } else {
-                                    alert(gameStatus)
-                                }
-                            });
-
-                        }).error(function (data, status, headers, config) {
-                            scope.errorMessage = "Can't send the move"
-                        });
-
+        function makePlayerMove() {
+            var parameters = {'fieldCords' : selectedField, 'direction': direction}
+            http.get('/move/turn').then(function () {
+                http.post("/move/create", parameters, {
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8'
                     }
-                }
-            });
+                }).then(function () {
+                    getMoveHistory().then(function () {
+                        var gameStatus = scope.movesInGame[scope.movesInGame.length - 1].status;
+                        if (gameStatus === 'IN_PROGRESS') {
+                            getNextMove();
+                        } else {
+                            //alert(gameStatus)
+                        }
+                    });
+
+                }).catch(function (data, status, headers, config) {
+                    scope.errorMessage = "Can't send the move"
+                    alert(scope.errorMessage)
+                });
+            }).catch(function (data) {
+                Swal.fire(data.data.message)
+            })
+        }
+        const drawSelectedField = () => {
+            for (const selectedFieldElement of selectedField) {
+                let selectedHexagon = hexagons[selectedFieldElement];
+                board.drawHexagon(selectedHexagon.x, selectedHexagon.y, "#296600");
+            }
+            board.drawGameState();
         };
+        function updateSelectedFields(key){
+            if(selectedField.includes(key)){
+                let selectedHexagon = hexagons[key];
+                board.drawHexagon(selectedHexagon.x, selectedHexagon.y, boardColor);
+                selectedField.splice(selectedField.indexOf(key),1)
+                return;
+            }
+            if(selectedField.length >= 3){
+                let selectedHexagon = hexagons[selectedField[0]];
+                board.drawHexagon(selectedHexagon.x, selectedHexagon.y, boardColor);
+                selectedField.shift()
+            }
+            selectedField.push(key)
+        }
+
+        scope.setDirection = function (dirX = 0, dirY = 0) {
+            direction.x = dirX;
+            direction.y = dirY;
+            makePlayerMove();
+        };
+
+        scope.getFieldsCords = function (fields){
+            let result = "";
+            for (let field of fields)  {
+                result+="(" + field.cordX + ", " + field.cordY + ") ";
+            }
+            return result;
+        }
+
+        scope.getDirectionArrow = function (x,y){
+            if(x === -1 && y === -1){
+                return "\u2199";
+            } else if (x === 0 && y === -1){
+                return "\u2193";
+            }else if (x === 1 && y === -1){
+                return "\u2198";
+            }else if (x === -1 && y === 1){
+                return "\u2196";
+            }else if (x === 0 && y === 1){
+                return "\u2191";
+            }else if (x === 1 && y === 1){
+                return "\u2197";
+            }
+        }
     }
 ]);
-
-
 
 

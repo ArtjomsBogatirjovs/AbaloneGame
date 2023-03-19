@@ -1,6 +1,6 @@
 package com.example.abalonegame.db.repository;
 
-import com.example.abalonegame.db.domain.Board;
+import com.example.abalonegame.db.entity.Board;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

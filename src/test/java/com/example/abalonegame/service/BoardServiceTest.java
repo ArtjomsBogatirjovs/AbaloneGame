@@ -1,18 +1,6 @@
 package com.example.abalonegame.service;
 
 
-import com.example.abalonegame.db.domain.Ball;
-import com.example.abalonegame.db.domain.Board;
-import com.example.abalonegame.db.domain.Field;
-import com.example.abalonegame.db.repository.BoardRepository;
-import com.example.abalonegame.enums.Color;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 class BoardServiceTest {

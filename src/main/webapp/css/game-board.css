@@ -1,0 +1,48 @@
+.center {
+    width: 20em;
+    height: 3em;
+    display: block;
+    justify-content: center;
+    align-items: center;
+    background: unset;
+    text-align: center;
+}
+
+button {
+    font-size: 24px;
+    padding: 12px 24px;
+    margin: 10px;
+    border-radius: 8px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #3e8e41;
+}
+
+#up {
+    text-align: center;
+}
+
+#down {
+    transform: rotate(180deg);
+}
+
+#up-left {
+    transform: rotate(-45deg);
+}
+
+#up-right {
+    transform: rotate(45deg);
+}
+
+#down-left {
+    transform: rotate(-135deg);
+}
+
+#down-right {
+    transform: rotate(135deg);
+}

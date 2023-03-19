@@ -1,4 +1,4 @@
-package com.example.abalonegame.db.domain;
+package com.example.abalonegame.db.entity;
 
 /*
     Class storage for gameplay

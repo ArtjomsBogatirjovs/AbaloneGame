@@ -1,17 +1,19 @@
 package com.example.abalonegame.validator;
 
 
-import com.example.abalonegame.db.domain.Board;
-import com.example.abalonegame.db.domain.Direction;
-import com.example.abalonegame.db.domain.Field;
-import com.example.abalonegame.db.domain.Movement;
-import com.example.abalonegame.enums.DirectionType;
+import com.example.abalonegame.db.entity.Board;
+import com.example.abalonegame.db.entity.Direction;
+import com.example.abalonegame.db.entity.Field;
+import com.example.abalonegame.db.entity.Movement;
+import com.example.abalonegame.enums.Coordinates;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.IllegalMovementException;
 import com.example.abalonegame.exception.InternalException;
 import com.example.abalonegame.service.BoardService;
 import com.example.abalonegame.service.DirectionService;
-import com.example.abalonegame.service.FieldService;
+import com.example.abalonegame.utils.BoardUtil;
+import com.example.abalonegame.utils.FieldUtil;
+import com.example.abalonegame.utils.GameUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,23 +29,22 @@ public class MovementValidator implements Validatable<Movement> {
     private BoardService bService = new BoardService(null);
 
     @Override
-    public void validate(Movement move) {
-        FieldService fieldService =null;// new FieldService(fieldRepository);
-        Set<Field> fieldsToMove = move.getFields();
+    public void validate(Movement movement) {
+        Set<Field> fieldsToMove = movement.getFields();
 
         if (fieldsToMove == null || fieldsToMove.isEmpty() || fieldsToMove.size() > MAX_MOVEMENT_FIELD_AMOUNT) {
             throw new IllegalMovementException(ExceptionMessage.WRONG_AMOUNT);
         }
-        if (isMovementEmpty(move)) {
+        if (isMovementEmpty(movement)) {
             throw new IllegalMovementException(ExceptionMessage.FIELD_WO_BALL);
         }
-        if (!fieldService.isRow(fieldsToMove)) {
+        if (FieldUtil.isRow(fieldsToMove)) {
             throw new IllegalMovementException(ExceptionMessage.NOT_ROW);
         }
-        if ((!isSumito(move) && isNeedToMoveBall(move))) {
+        if ((!isSumito(movement) && isNeedToMoveBall(movement))) {
             throw new IllegalMovementException(ExceptionMessage.CANT_MOVE);
         }
-        if (!isPossibleToMoveOpponent(move)) {
+        if (!isPossibleToMoveOpponent(movement)) {
             throw new IllegalMovementException(ExceptionMessage.CANT_MOVE);
         }
     }
@@ -70,7 +71,7 @@ public class MovementValidator implements Validatable<Movement> {
 
         Field[][] gameBoard = null;//board.getGameBoard();
 
-        Set<Field> boardSet = bService.boardToFieldList(gameBoard);
+        Set<Field> boardSet = BoardUtil.boardToFieldList(gameBoard);
         ArrayList<Field> boardAsList = new ArrayList<>(List.copyOf(boardSet));
         Set<Field> fieldsSet = move.getFields();
         ArrayList<Field> fields = new ArrayList<>(List.copyOf(fieldsSet));
@@ -80,17 +81,17 @@ public class MovementValidator implements Validatable<Movement> {
         int toIterate = fields.size() + maxMoveBall;
 
         Field field = fields.get(0);
-        int x = field.getXCord();
-        int y = field.getYCord();
+        int x = field.getCordX();
+        int y = field.getCordY();
 
         Direction direction = move.getDirection();
-        int xDir = dService.getDirection(direction, DirectionType.X);
-        int yDir = dService.getDirection(direction, DirectionType.Y);
+        int xDir = GameUtil.getDirection(direction, Coordinates.X);
+        int yDir = GameUtil.getDirection(direction, Coordinates.Y);
 
         for (int i = 0; i < toIterate; i++) {
             x += xDir;
             y += yDir;
-            Field tempField = bService.findField(x, y, boardSet);
+            Field tempField = bService.findFieldOnBoardByCoords(x, y, boardSet);
             if (fields.contains(tempField)) {
                 continue;
             }
@@ -107,16 +108,16 @@ public class MovementValidator implements Validatable<Movement> {
     }
 
     public boolean isDirectionLikeRow(Movement move) {
-        DirectionService dService = new DirectionService();
+        //DirectionService dService = new DirectionService();
         //BoardService bService = new BoardService(boardRepository);
         if (move.getFields().size() < MIN_BALLS_TO_SUMITO) {
             return true;
         }
-        int xDir = dService.getDirection(move.getDirection(), DirectionType.X);
-        int yDir = dService.getDirection(move.getDirection(), DirectionType.Y);
+        int xDir = GameUtil.getDirection(move.getDirection(), Coordinates.X);
+        int yDir = GameUtil.getDirection(move.getDirection(), Coordinates.Y);
         for (Field field : move.getFields()) {
-            if (bService.findField(field.getXCord() + xDir, field.getYCord() + yDir, move.getFields()) == null
-                    && bService.findField(field.getXCord() - xDir, field.getYCord() - yDir, move.getFields()) == null) {
+            if (bService.findFieldOnBoardByCoords(field.getCordX() + xDir, field.getCordY() + yDir, move.getFields()) == null
+                    && bService.findFieldOnBoardByCoords(field.getCordX() - xDir, field.getCordY() - yDir, move.getFields()) == null) {
                 return false;
             }
         }
@@ -137,19 +138,19 @@ public class MovementValidator implements Validatable<Movement> {
             throw new InternalException(ExceptionMessage.NO_BOARD);
         }
         //BoardService bService = new BoardService(boardRepository);
-        DirectionService dService = new DirectionService();
+        //DirectionService dService = new DirectionService();
 
         Board board = move.getBoard();
         Direction direction = move.getDirection();
 
         Field[][] gameBoard =null;// board.getGameBoard();
-        Set<Field> boardAsList = bService.boardToFieldList(gameBoard);
+        Set<Field> boardAsList = BoardUtil.boardToFieldList(gameBoard);
         Set<Field> fields = move.getFields();
 
-        int xDir = dService.getDirection(direction, DirectionType.X);
-        int yDir = dService.getDirection(direction, DirectionType.Y);
+        int xDir = GameUtil.getDirection(direction, Coordinates.X);
+        int yDir = GameUtil.getDirection(direction, Coordinates.Y);
         for (Field field : fields) {
-            Field fieldToMove = bService.findField(xDir + field.getXCord(), yDir + field.getYCord(), boardAsList);
+            Field fieldToMove = bService.findFieldOnBoardByCoords(xDir + field.getCordX(), yDir + field.getCordY(), boardAsList);
             if (!fields.contains(fieldToMove)) {
                 if (fieldToMove.getColor() != null) {//getBall
                     return true;

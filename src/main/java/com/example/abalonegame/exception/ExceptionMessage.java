@@ -9,7 +9,9 @@ public enum ExceptionMessage {
     NOT_ROW("The balls not in one row!"),
     FIELD_WO_BALL("Chosen field without ball!"),
     NO_BOARD("No info about gameplay field!"),
-    CANT_MOVE("Not possible to move ball");
+    CANT_MOVE("Not possible to move ball"),
+    NOT_YOUR_TURN("At the moment not your turn!"),
+    INTERNAL_ERROR("Unexpected error please contact admin!");
     private final String message;
     ExceptionMessage(String aMessage) {
         message = aMessage;

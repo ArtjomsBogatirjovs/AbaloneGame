@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 
-<html ng-app="abalone">
+<html ng-app="abalone" lang="en">
 
 <head>
+    <title>Homepage</title>
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" media="screen" href="css/application.css">
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
@@ -16,19 +18,11 @@
     <script src="js/application.js"></script>
     <script src="js/GameModule.js"></script>
 
-    <script defer src="js/canvas.js"></script>
     <script defer src="js/global-variables.js"></script>
     <script defer src="js/renderer.js"></script>
-    <script defer src="js/dark-mode.js"></script>
-    <script defer src="js/game.js"></script>
-    <script defer src="js/socket.js"></script>
-    <script defer src="js/script.js"></script>
 
 </head>
-
-
 <body>
-
     <nav class="navbar navbar-inverse" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -45,13 +39,9 @@
             </div>
         </div>
     </nav>
-
     <div ng-view="name"></div>
-
     <footer class="text-center">
         Abalone in Spring Boot and Angular JS
     </footer>
-
 </body>
-
 </html>

@@ -1,9 +1,8 @@
-package com.example.abalonegame.db.domain;
+package com.example.abalonegame.db.entity;
 
 import com.example.abalonegame.enums.Color;
 import lombok.*;
 
-import javax.annotation.security.DeclareRoles;
 import javax.persistence.*;
 
 import static com.example.abalonegame.enums.Color.BLACK;

@@ -1,4 +1,4 @@
-package com.example.abalonegame.db.domain;
+package com.example.abalonegame.db.entity;
 
 import com.example.abalonegame.enums.Color;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -26,15 +25,15 @@ public class Field {
     @ManyToOne(cascade = CascadeType.ALL)
     private Board board;
     @Column(name = "x",nullable = false)
-    private int xCord;
+    private int cordX;
     @Column(name = "y",nullable = false)
-    private int yCord;
+    private int cordY;
     @Column(name = "DropField", nullable = false)
     private boolean isDropField = false;
 
-    public Field(int xCord, int yCord) {
-        this.xCord = xCord;
-        this.yCord = yCord;
+    public Field(int cordX, int cordY) {
+        this.cordX = cordX;
+        this.cordY = cordY;
     }
 
     public Color getColor() {
@@ -45,12 +44,12 @@ public class Field {
         this.color = color;
     }
 
-    public int getXCord() {
-        return xCord;
+    public int getCordX() {
+        return cordX;
     }
 
-    public int getYCord() {
-        return yCord;
+    public int getCordY() {
+        return cordY;
     }
 
     public void setBoard(Board board) {
@@ -61,16 +60,16 @@ public class Field {
         isDropField = dropField;
     }
 
-    public Field(int xCord, int yCord, boolean isDropField) {
-        this.xCord = xCord;
-        this.yCord = yCord;
+    public Field(int cordX, int cordY, boolean isDropField) {
+        this.cordX = cordX;
+        this.cordY = cordY;
         this.isDropField = isDropField;
     }
-    public Field(Color color, Board board, int xCord, int yCord, boolean isDropField) {
+    public Field(Color color, Board board, int cordX, int cordY, boolean isDropField) {
         this.color = color;
         this.board = board;
-        this.xCord = xCord;
-        this.yCord = yCord;
+        this.cordX = cordX;
+        this.cordY = cordY;
         this.isDropField = isDropField;
     }
 }

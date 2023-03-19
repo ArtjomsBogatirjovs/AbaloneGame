@@ -1,4 +1,4 @@
-package com.example.abalonegame.db.domain;
+package com.example.abalonegame.db.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,11 +19,11 @@ public class Movement {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id",nullable = false)
     private long id;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Direction direction;
-    @OneToMany
+    @ManyToMany(cascade = CascadeType.PERSIST)
     private Set<Field> fields;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Board board;
     @ManyToOne
     @JoinColumn(name = "player_id", nullable = true)

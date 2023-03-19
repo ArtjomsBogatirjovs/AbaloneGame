@@ -1,6 +1,6 @@
 package com.example.abalonegame.security;
 
-import com.example.abalonegame.db.domain.Player;
+import com.example.abalonegame.db.entity.Player;
 
 import com.google.common.collect.ImmutableSet;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

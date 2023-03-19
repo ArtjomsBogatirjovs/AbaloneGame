@@ -1,6 +1,6 @@
 package com.example.abalonegame;
 
-import com.example.abalonegame.db.domain.Player;
+import com.example.abalonegame.db.entity.Player;
 import com.example.abalonegame.db.repository.PlayerRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -19,7 +19,7 @@ public class AbaloneGameApplication {
     public CommandLineRunner demo(PlayerRepository playerRepository) {
         return (args) -> {
 
-            //save a couple of players
+//            save a couple of players
 //            playerRepository.deleteAll();
 //            playerRepository.save(new Player("Player1", new BCryptPasswordEncoder().encode("1")));
 //            playerRepository.save(new Player("Player2", new BCryptPasswordEncoder().encode("1")));

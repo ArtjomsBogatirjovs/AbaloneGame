@@ -1,4 +1,4 @@
-package com.example.abalonegame.db.domain;
+package com.example.abalonegame.db.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,10 +16,10 @@ public class Direction {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Movement move;
     @Column(name = "x")
-    private Boolean x;
+    private Integer x;
     @Column(name = "y")
-    private Boolean y;
+    private Integer y;
 }
