@@ -13,9 +13,10 @@ gameModule.controller('newGameController', ['$rootScope', '$scope', '$http', '$l
             selectedColor: {name: 'BLACK'},
             availableGameTypes: [
                 {name: 'PvP'},
-                {name: 'PvE'}
+                {name: 'PvE'},
+                {name: 'LOCAL'}
             ],
-            selectedBoardDimension: {name: 'PvE'}
+            selectedBoardDimension: {name: 'LOCAL'}
         };
         scope.createNewGame = function () {
             const data = scope.newGameData;
@@ -82,14 +83,16 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         initGameParams();
 
         function makePlayerMove() {
+
             const parameters = {'fieldCords': selectedField, 'direction': direction}
             http.get('/move/turn').then(function () {
                 http.post("/move/create", parameters, {
                     headers: {
                         'Content-Type': 'application/json; charset=UTF-8'
                     }
-                }).then(function () {
+                }).then(function (data) {
                     initGameParams();
+
                     //getNextMove();
                     stompClient.send('/topic/movement/' + routeParams.id, {}, "lol")
                 }).catch(function (data) {
@@ -217,7 +220,8 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
             );
             return distanceToCorner <= scale / 2;
         }
-        function raiseError(message){
+
+        function raiseError(message) {
             Swal.fire(message)
             subscribe("/topic/movement/" + routeParams.id, initGameParams)
         }

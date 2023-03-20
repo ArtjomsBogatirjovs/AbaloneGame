@@ -12,6 +12,7 @@ import com.example.abalonegame.enums.GameType;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.NotFoundException;
 import com.example.abalonegame.utils.BoardUtil;
+import com.example.abalonegame.validator.GameplayValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class GameplayService {
+public class GameplayService extends GameplayValidator {
 
     private final GameplayRepository gameplayRepository;
 
@@ -40,10 +41,15 @@ public class GameplayService {
                 GameStatus.WAITS_FOR_PLAYER);
         gameplay.setCreated(new Date());
         gameplay.setBoard(gameBoard);
+        if(createGameDTO.getGameType().equals(GameType.LOCAL)){
+            gameplay.setPlayerTwo(player);
+            gameplay.setStatus(GameStatus.IN_PROGRESS);
+        }
         gameplayRepository.save(gameplay);
         return gameplay;
     }
-    public GameDTO createGameDTO(Gameplay gameplay, Set<Field> gameBoard){
+
+    public GameDTO createGameDTO(Gameplay gameplay, Set<Field> gameBoard) {
         GameDTO gameDTO = new GameDTO();
         gameDTO.setStatus(gameplay.getStatus());
         gameDTO.setBallsCords(BoardUtil.convertGameBoardToResponse(gameBoard));
@@ -78,5 +84,12 @@ public class GameplayService {
             throw new NotFoundException(ExceptionMessage.NOT_FOUND);
         }
         return gameplayRepository.findById(id).get();
+    }
+
+    public void updateGameStatus(Gameplay gameplay, GameStatus status) {
+        if (status != null && gameplay != null) {
+            gameplay.setStatus(status);
+            gameplayRepository.save(gameplay);
+        }
     }
 }

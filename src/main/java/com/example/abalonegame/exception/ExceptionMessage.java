@@ -11,6 +11,7 @@ public enum ExceptionMessage {
     NO_BOARD("No info about gameplay field!"),
     CANT_MOVE("Not possible to move ball"),
     NOT_YOUR_TURN("At the moment not your turn!"),
+    MOVE_TO_DROP_FIELD("Suicide tactic not allowed!"),
     INTERNAL_ERROR("Unexpected error please contact admin!");
     private final String message;
     ExceptionMessage(String aMessage) {

@@ -103,5 +103,20 @@ public abstract class MovementUtil {
         }
         return false;
     }
+    public static boolean isMoveToDropField(Movement movement, Set<Field> gameBoard){
+        Set<Field> movementFields = movement.getFields();
+        Direction direction = movement.getDirection();
+
+        int xDir = direction.getX();
+        int yDir = direction.getY();
+
+        for(Field field : movementFields){
+            Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(field.getCordX()+ xDir,field.getCordY() + yDir,gameBoard);
+            if(fieldToMove.isDropField()){
+                return true;
+            }
+        }
+        return false;
+    }
 }
 

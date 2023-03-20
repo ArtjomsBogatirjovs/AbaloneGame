@@ -1,11 +1,8 @@
 package com.example.abalonegame.utils;
 
-import com.example.abalonegame.db.entity.Board;
-import com.example.abalonegame.db.entity.Direction;
-import com.example.abalonegame.db.entity.Field;
-import com.example.abalonegame.db.entity.Movement;
+import com.example.abalonegame.db.entity.*;
 import com.example.abalonegame.enums.Color;
-import com.example.abalonegame.enums.Coordinates;
+import com.example.abalonegame.enums.GameStatus;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.InternalException;
 
@@ -17,6 +14,8 @@ import static com.example.abalonegame.db.entity.Board.GAMING_BOARD_MIDDLE;
 import static com.example.abalonegame.db.entity.Field.DROP_FIELD;
 
 public abstract class BoardUtil {
+    public static int BALLS_TO_LOSE = 8;
+
     public static Set<Field> createGameBoardFields(Board board) {
         Set<Field> gameBoard = new HashSet<>();
         for (int x = 0; x <= GAMING_BOARD_MIDDLE; x++) {
@@ -45,15 +44,6 @@ public abstract class BoardUtil {
             }
         }
         return gameBoard;
-    }
-
-    public static Set<Field> boardToFieldList(Field[][] board) {
-        Set<Field> result = new HashSet<>();
-
-        for (Field[] fieldArray : board) {
-            result.addAll(Arrays.asList(fieldArray));
-        }
-        return result;
     }
 
     public static Set<Field> makeMove(Set<Field> gameBoard, Movement move) {
@@ -90,7 +80,7 @@ public abstract class BoardUtil {
                         return gameBoard;
                     } else {
                         throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
-                   }
+                    }
                 }
                 FieldUtil.transferBall(fieldToMove, firstEmptyFieldInDirection);
                 firstEmptyFieldInDirection = fieldToMove;
@@ -115,5 +105,37 @@ public abstract class BoardUtil {
             }
         }
         return response;
+    }
+
+    public static GameStatus checkIfPlayerWin(Set<Field> gameBoard, Gameplay gameplay) {
+        int blackBalls = 0;
+        int whiteBalls = 0;
+        Color firstPlayerColor = gameplay.getFirstPlayerColor();
+        for (Field field : gameBoard) {
+            if (Color.BLACK.equals(field.getColor())) {
+                blackBalls++;
+            }
+            if (Color.WHITE.equals(field.getColor())) {
+                whiteBalls++;
+            }
+        }
+        if (blackBalls > BALLS_TO_LOSE && whiteBalls > BALLS_TO_LOSE){
+            return null;
+        }
+        if(blackBalls <= BALLS_TO_LOSE){
+            if(firstPlayerColor.equals(Color.BLACK)){
+                return GameStatus.SECOND_PLAYER_WON;
+            } else {
+                return GameStatus.FIRST_PLAYER_WON;
+            }
+        }
+        if(whiteBalls <= BALLS_TO_LOSE){
+            if(firstPlayerColor.equals(Color.WHITE)){
+                return GameStatus.SECOND_PLAYER_WON;
+            } else {
+                return GameStatus.FIRST_PLAYER_WON;
+            }
+        }
+        return null;
     }
 }

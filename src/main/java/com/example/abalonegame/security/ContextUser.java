@@ -4,9 +4,10 @@ import com.example.abalonegame.db.entity.Player;
 
 import com.google.common.collect.ImmutableSet;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
 
-public class ContextUser extends org.springframework.security.core.userdetails.User {
+public class ContextUser extends User {
 
     private final Player player;
 

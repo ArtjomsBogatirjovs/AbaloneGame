@@ -2,9 +2,7 @@ package com.example.abalonegame.utils;
 
 
 import com.example.abalonegame.db.entity.*;
-import com.example.abalonegame.enums.Color;
-import com.example.abalonegame.enums.Coordinates;
-import com.example.abalonegame.enums.FieldCoordinates;
+import com.example.abalonegame.enums.*;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.InternalException;
 import com.example.abalonegame.exception.ValidateException;
@@ -14,6 +12,9 @@ import java.util.*;
 
 public abstract class GameUtil {
     public static boolean isPlayerTurn(Gameplay currentGameplay, Player currentPlayer, Movement lastMovement) {
+        if(currentGameplay.getGameType().equals(GameType.LOCAL)){
+            return true;
+        }
         if (lastMovement == null) {
             if (currentPlayer.equals(currentGameplay.getPlayerOne())) {
                 return true;
@@ -113,6 +114,9 @@ public abstract class GameUtil {
             }
         }
         return result + y;
+    }
+    public static boolean isFinished(Gameplay gameplay){
+        return !gameplay.getStatus().equals(GameStatus.WAITS_FOR_PLAYER) && !gameplay.getStatus().equals(GameStatus.IN_PROGRESS);
     }
 }
 

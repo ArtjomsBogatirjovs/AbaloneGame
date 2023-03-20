@@ -3,8 +3,8 @@ package com.example.abalonegame.service;
 
 import com.example.abalonegame.db.entity.*;
 import com.example.abalonegame.db.repository.MovementRepository;
-import com.example.abalonegame.dto.CreateMoveDTO;
 import com.example.abalonegame.dto.MoveDTO;
+import com.example.abalonegame.dto.CreateMoveDTO;
 import com.example.abalonegame.enums.Color;
 import com.example.abalonegame.enums.GameType;
 import com.example.abalonegame.utils.GameUtil;
@@ -26,7 +26,7 @@ public class MovementService extends MovementValidator {
         this.movementRepository = movementRepository;
     }
     //FINISHED
-    public Movement createMove(Gameplay gameplay, Player player, CreateMoveDTO moveDTO, HashSet<Field> fields) {
+    public Movement createMove(Gameplay gameplay, Player player, MoveDTO moveDTO, HashSet<Field> fields) {
         Movement move = new Movement();
         move.setDirection(moveDTO.getDirection());
         move.setFields(fields);
@@ -37,20 +37,20 @@ public class MovementService extends MovementValidator {
         return move;
     }
     //FINISHED NEED TO TEST
-    public List<MoveDTO> getMovesInGame(Gameplay gameplay) {
+    public List<CreateMoveDTO> getMovesInGame(Gameplay gameplay) {
         List<Movement> movesInGame = movementRepository.findByBoard(gameplay.getBoard());
-        List<MoveDTO> moves = new ArrayList<>();
+        List<CreateMoveDTO> moves = new ArrayList<>();
         Color firstPlayerColor = gameplay.getFirstPlayerColor();
         Color secondPlayerColor = firstPlayerColor.equals(Color.BLACK) ? Color.WHITE : Color.BLACK;
         for (Movement movement : movesInGame) {
             Color currentColor = gameplay.getPlayerOne().equals(movement.getPlayer()) ? firstPlayerColor : secondPlayerColor;
-            MoveDTO moveDTO = new MoveDTO();
-            moveDTO.setDirection(movement.getDirection());
-            moveDTO.setFields(movement.getFields());
-            moveDTO.setCreated(movement.getCreated());
-            moveDTO.setPlayerName(movement.getPlayer() == null ? GameType.PvE.toString() : movement.getPlayer().getName());
-            moveDTO.setPlayerColor(currentColor);
-            moves.add(moveDTO);
+            CreateMoveDTO createMoveDTO = new CreateMoveDTO();
+            createMoveDTO.setDirection(movement.getDirection());
+            createMoveDTO.setFields(movement.getFields());
+            createMoveDTO.setCreated(movement.getCreated());
+            createMoveDTO.setPlayerName(movement.getPlayer() == null ? GameType.PvE.toString() : movement.getPlayer().getName());
+            createMoveDTO.setPlayerColor(currentColor);
+            moves.add(createMoveDTO);
         }
         return moves;
     }
@@ -63,6 +63,10 @@ public class MovementService extends MovementValidator {
     }
     public void validateAndSave(Movement move, Set<Field> gameBoard){
         validate(move,gameBoard);
+        saveMovement(move,gameBoard);
+    }
+    public void saveMovement(Movement move, Set<Field> gameBoard){
+        validate2(move,gameBoard);//TODO DELETE
         movementRepository.save(move);
     }
 }
