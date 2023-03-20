@@ -22,4 +22,23 @@ const fieldDefinition = {
 
 let gameState;
 
+const socket = new SockJS('/abalone');
+const stompClient = Stomp.over(socket);
+
+function subscribe(topic,callback){
+    const connected = stompClient.connected;
+    if(connected){
+        subscribeToTopic(topic,callback);
+        return;
+    }
+    stompClient.connect({},function (){
+        subscribeToTopic(topic,callback);
+    });
+}
+function subscribeToTopic(topic, callback){
+    stompClient.subscribe(topic, function () {
+        callback();
+    })
+}
+
 

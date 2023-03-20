@@ -23,7 +23,7 @@ public abstract class MovementValidator implements Validatable<Movement> {
         if (fieldsToMove == null || fieldsToMove.isEmpty() || fieldsToMove.size() > MovementUtil.MAX_MOVEMENT_FIELD_AMOUNT) {
             throw new IllegalMovementException(ExceptionMessage.WRONG_AMOUNT);
         }
-        if (MovementUtil.isMovementEmpty(movement)) {
+        if (MovementUtil.isMovementWithoutBalls(movement)) {
             throw new IllegalMovementException(ExceptionMessage.FIELD_WO_BALL);
         }
         if (!FieldUtil.isRow(fieldsToMove)) {

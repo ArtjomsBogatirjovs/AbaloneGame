@@ -10,7 +10,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
     <script src="bower_components/angular/angular.min.js"></script>
     <script src="bower_components/angular-postman/js/postman.min.js"></script>
     <script src="bower_components/angular-route/angular-route.min.js"></script>
@@ -20,28 +19,32 @@
 
     <script defer src="js/global-variables.js"></script>
     <script defer src="js/renderer.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.2/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
 </head>
 <body>
-    <nav class="navbar navbar-inverse" role="navigation">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="/">Abalone game</a>
-            </div>
-            <div class="collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="#/about">About</a></li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a><strong><logged-user/></strong></a></li>
-                    <li><a href="/login?logout">Logout</a></li>
-                </ul>
-            </div>
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Abalone game</a>
         </div>
-    </nav>
-    <div ng-view="name"></div>
-    <footer class="text-center">
-        Abalone in Spring Boot and Angular JS
-    </footer>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#/about">About</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a><strong>
+                    <logged-user/>
+                </strong></a></li>
+                <li><a href="/login?logout">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div ng-view="name"></div>
+<footer class="text-center">
+    Abalone in Spring Boot and Angular JS
+</footer>
 </body>
 </html>

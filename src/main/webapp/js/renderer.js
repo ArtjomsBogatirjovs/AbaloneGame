@@ -26,13 +26,8 @@ const board = {
         }
     },
 
-    drawGameState: function (boardIds) {
-        console.log(boardIds)
-        if (boardIds === undefined) {
-            boardIds = gameState;
-        }
-        console.log(boardIds)
-        for (const [key, value] of Object.entries(boardIds)) {
+    drawGameState: function () {
+        for (const [key, value] of Object.entries(gameState)) {
             value.forEach((field) => {
                 const img = new Image();
                 img.src = `./assets/ball-${key}.svg`;

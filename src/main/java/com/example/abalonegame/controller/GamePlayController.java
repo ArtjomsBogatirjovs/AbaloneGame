@@ -4,6 +4,7 @@ import com.example.abalonegame.db.entity.Board;
 import com.example.abalonegame.db.entity.Field;
 import com.example.abalonegame.db.entity.Gameplay;
 import com.example.abalonegame.db.entity.Player;
+import com.example.abalonegame.dto.CreateGameDTO;
 import com.example.abalonegame.dto.GameDTO;
 import com.example.abalonegame.exception.InvalidGameException;
 import com.example.abalonegame.exception.NotFoundException;
@@ -37,15 +38,14 @@ public class GamePlayController {
     HttpSession httpSession;
 
     @PostMapping("/create")
-    public Gameplay start(@RequestBody GameDTO gameDTO) {
+    public GameDTO start(@RequestBody CreateGameDTO createGameDTO) {
         Player tempPlayer = playerService.getLoggedUser();
         Board gameplayBoard = boardService.getNewBoard();
+        httpSession.setAttribute("gameId", createGameDTO.getId());
         Set<Field> gameBoard = BoardUtil.createGameBoardFields(gameplayBoard);
         fieldService.saveGameBoardFields(gameBoard);
-        Gameplay gameplay = gameplayService.createGame(tempPlayer, gameDTO, gameplayBoard);
-        httpSession.setAttribute("gameId", gameDTO.getId());
-        log.info("start game request: {}", tempPlayer);
-        return gameplay;
+        Gameplay gameplay = gameplayService.createAndSaveGame(tempPlayer, createGameDTO, gameplayBoard);
+        return gameplayService.createGameDTO(gameplay,gameBoard);
     }
 
     @RequestMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -59,15 +59,15 @@ public class GamePlayController {
     }
 
     @PostMapping("/connect")
-    public Gameplay connectRandom(@RequestBody GameDTO gameDTO) throws NotFoundException, InvalidGameException {
-        return gameplayService.connectGame(playerService.getLoggedUser(), gameDTO);
+    public Gameplay connect(@RequestBody CreateGameDTO createGameDTO) throws NotFoundException, InvalidGameException {
+        return gameplayService.connectGame(playerService.getLoggedUser(), createGameDTO);
     }
 
     @RequestMapping(value = "/{id}")
-    public Gameplay getGameProperties(@PathVariable Long id) {
+    public GameDTO getGameProperties(@PathVariable Long id) {
         httpSession.setAttribute("gameId", id);
         Gameplay gameplay = gameplayService.getGameplay(id);
-        gameplay.setTempMap(BoardUtil.convertGameBoardToResponse(fieldService.getGameBoardFields(gameplay.getBoard()))); //TODO DELETE
-        return gameplay;
+        Set<Field> gameBoard = fieldService.getGameBoardFields(gameplay.getBoard());
+        return gameplayService.createGameDTO(gameplay, gameBoard);
     }
 }

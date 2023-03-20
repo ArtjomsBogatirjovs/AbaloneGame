@@ -17,7 +17,9 @@ public class BoardService { //TODO custom board create
     }
 
     public Board getNewBoard() {
-        return new Board();
+        Board board = new Board();
+        boardRepository.save(board);
+        return board;
     }
 
 }

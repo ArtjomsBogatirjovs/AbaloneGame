@@ -11,8 +11,6 @@ import com.example.abalonegame.utils.BoardUtil;
 import com.example.abalonegame.utils.GameUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,11 +36,11 @@ public class MovementController {
     MovementService movementService;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public Map<Color, ArrayList<String>> createMove(@RequestBody CreateMoveDTO createMoveDTO) {//TODO validate if list<0 or list>3,no duplicated value
+    public Map<Color, ArrayList<String>> createMove(@RequestBody CreateMoveDTO createMoveDTO) {
         Long gameId = (Long) httpSession.getAttribute("gameId");
         Gameplay gameplay = gameplayService.getGameplay(gameId);
-        Board board = gameplay.getBoard();
         Player currentPlayer = playerService.getLoggedUser();
+        Board board = gameplay.getBoard();
         Color playerColor = GameUtil.getPlayerColor(gameplay, currentPlayer);
 
         ArrayList<Map<Coordinates, FieldCoordinates>> tempFieldCords = GameUtil.resolveCoordinateList(createMoveDTO.getFieldCords());

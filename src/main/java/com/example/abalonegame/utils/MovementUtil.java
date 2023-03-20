@@ -39,6 +39,7 @@ public abstract class MovementUtil {
         }
         return false;
     }
+
     public static boolean isPossibleToMoveOpponent(Movement move, Set<Field> gameBoard) {//TODO make BallCounterService
         if (!isSumito(move, gameBoard)) {
             return false;
@@ -77,8 +78,7 @@ public abstract class MovementUtil {
         return true;
     }
 
-
-    public static boolean isMovementEmpty(Movement move) {
+    public static boolean isMovementWithoutBalls(Movement move) {
         for (Field tempField : move.getFields()) {
             if (tempField.getColor() == null) {
                 return true;

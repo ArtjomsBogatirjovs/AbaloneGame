@@ -1,20 +1,24 @@
 package com.example.abalonegame.service;
 
 import com.example.abalonegame.db.entity.Board;
+import com.example.abalonegame.db.entity.Field;
 import com.example.abalonegame.db.entity.Gameplay;
 import com.example.abalonegame.db.entity.Player;
 import com.example.abalonegame.db.repository.GameplayRepository;
+import com.example.abalonegame.dto.CreateGameDTO;
 import com.example.abalonegame.dto.GameDTO;
 import com.example.abalonegame.enums.GameStatus;
 import com.example.abalonegame.enums.GameType;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.NotFoundException;
+import com.example.abalonegame.utils.BoardUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,21 +31,28 @@ public class GameplayService {
         this.gameplayRepository = gameRepository;
     }
 
-    public Gameplay createGame(Player player, GameDTO gameDTO, Board gameBoard) {
+    public Gameplay createAndSaveGame(Player player, CreateGameDTO createGameDTO, Board gameBoard) {
         Gameplay gameplay = new Gameplay();
         gameplay.setPlayerOne(player);
-        gameplay.setGameType(gameDTO.getGameType());
-        gameplay.setFirstPlayerColor(gameDTO.getColor());
-        gameplay.setStatus(gameDTO.getGameType() == GameType.PvE ? GameStatus.IN_PROGRESS :
+        gameplay.setGameType(createGameDTO.getGameType());
+        gameplay.setFirstPlayerColor(createGameDTO.getColor());
+        gameplay.setStatus(createGameDTO.getGameType() == GameType.PvE ? GameStatus.IN_PROGRESS :
                 GameStatus.WAITS_FOR_PLAYER);
         gameplay.setCreated(new Date());
         gameplay.setBoard(gameBoard);
         gameplayRepository.save(gameplay);
         return gameplay;
     }
+    public GameDTO createGameDTO(Gameplay gameplay, Set<Field> gameBoard){
+        GameDTO gameDTO = new GameDTO();
+        gameDTO.setStatus(gameplay.getStatus());
+        gameDTO.setBallsCords(BoardUtil.convertGameBoardToResponse(gameBoard));
+        gameDTO.setGameId(gameplay.getId());
+        return gameDTO;
+    }
 
-    public Gameplay connectGame(Player player, GameDTO gameDTO) {
-        Gameplay gameplay = getGameplay(gameDTO.getId());
+    public Gameplay connectGame(Player player, CreateGameDTO createGameDTO) {
+        Gameplay gameplay = getGameplay(createGameDTO.getId());
         gameplay.setPlayerTwo(player);
         gameplay.setStatus(GameStatus.IN_PROGRESS);
         gameplayRepository.save(gameplay);
