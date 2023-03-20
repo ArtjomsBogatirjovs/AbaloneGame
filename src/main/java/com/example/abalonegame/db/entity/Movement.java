@@ -1,5 +1,6 @@
 package com.example.abalonegame.db.entity;
 
+import com.example.abalonegame.enums.Color;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,5 +31,8 @@ public class Movement {
     private Player player;
     @Column(name = "created", nullable = false)
     private Date created;
+    @Column(name = "color", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Color movementColor;
 
 }

@@ -41,7 +41,6 @@ public class MovementController {
         Gameplay gameplay = gameplayService.getGameplay(gameId);
         Player currentPlayer = playerService.getLoggedUser();
         Board board = gameplay.getBoard();
-        Color playerColor = GameUtil.getPlayerColor(gameplay, currentPlayer);
 
         ArrayList<Map<Coordinates, FieldCoordinates>> tempFieldCords = GameUtil.resolveCoordinateList(createMoveDTO.getFieldCords());
         ArrayList<Field> fieldsToMove = fieldService.findFieldsFromMaps(tempFieldCords, board);

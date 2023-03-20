@@ -2,8 +2,8 @@ package com.example.abalonegame.utils;
 
 import com.example.abalonegame.db.entity.Direction;
 import com.example.abalonegame.db.entity.Field;
+import com.example.abalonegame.db.entity.Movement;
 import com.example.abalonegame.enums.Color;
-import com.example.abalonegame.enums.Coordinates;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.InternalException;
 
@@ -125,5 +125,13 @@ public abstract class FieldUtil {
             }
         }
         return null;
+    }
+    public static boolean isColorMatchFieldsColor(Set<Field> fields, Color color){
+        for (Field field: fields) {
+            if(!color.equals(field.getColor())){
+                return false;
+            }
+        }
+        return true;
     }
 }

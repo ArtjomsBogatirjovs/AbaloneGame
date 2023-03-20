@@ -23,11 +23,17 @@ public abstract class MovementValidator implements Validatable<Movement> {
         if (fieldsToMove == null || fieldsToMove.isEmpty() || fieldsToMove.size() > MovementUtil.MAX_MOVEMENT_FIELD_AMOUNT) {
             throw new IllegalMovementException(ExceptionMessage.WRONG_AMOUNT);
         }
+        if(!FieldUtil.isColorMatchFieldsColor(movement.getFields(), movement.getMovementColor())){
+            throw new IllegalMovementException(ExceptionMessage.COLOR_MISMATCH);
+        }
         if (MovementUtil.isMovementWithoutBalls(movement)) {
             throw new IllegalMovementException(ExceptionMessage.FIELD_WO_BALL);
         }
         if (!FieldUtil.isRow(fieldsToMove)) {
             throw new IllegalMovementException(ExceptionMessage.NOT_ROW);
+        }
+        if(MovementUtil.isNeedToMoveBallWithSameColor(movement,gameBoard)){
+            throw new IllegalMovementException(ExceptionMessage.MOVE_ONLY_OTHER_COLOR);
         }
         if ((MovementUtil.isSumito(movement, gameBoard) && !MovementUtil.isPossibleToMoveOpponent(movement, gameBoard))) {
             throw new IllegalMovementException(ExceptionMessage.CANT_MOVE);

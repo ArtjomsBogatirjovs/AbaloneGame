@@ -3,6 +3,7 @@ package com.example.abalonegame.utils;
 import com.example.abalonegame.db.entity.Direction;
 import com.example.abalonegame.db.entity.Field;
 import com.example.abalonegame.db.entity.Movement;
+import com.example.abalonegame.enums.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +82,22 @@ public abstract class MovementUtil {
     public static boolean isMovementWithoutBalls(Movement move) {
         for (Field tempField : move.getFields()) {
             if (tempField.getColor() == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public static boolean isNeedToMoveBallWithSameColor(Movement movement, Set<Field> gameBoard){
+        Set<Field> movementFields = movement.getFields();
+        Direction direction = movement.getDirection();
+
+        int xDir = direction.getX();
+        int yDir = direction.getY();
+
+        for(Field field : movementFields){
+            Field tempField = FieldUtil.findSameFieldOnBoard(field,gameBoard);
+            Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(tempField.getCordX()+ xDir,tempField.getCordY() + yDir,gameBoard);
+            if(movement.getMovementColor().equals(fieldToMove.getColor()) && !movementFields.contains(fieldToMove)){
                 return true;
             }
         }

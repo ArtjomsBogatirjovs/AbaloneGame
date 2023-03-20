@@ -7,6 +7,7 @@ import com.example.abalonegame.dto.CreateMoveDTO;
 import com.example.abalonegame.dto.MoveDTO;
 import com.example.abalonegame.enums.Color;
 import com.example.abalonegame.enums.GameType;
+import com.example.abalonegame.utils.GameUtil;
 import com.example.abalonegame.validator.MovementValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -25,13 +26,14 @@ public class MovementService extends MovementValidator {
         this.movementRepository = movementRepository;
     }
     //FINISHED
-    public Movement createMove(Gameplay game, Player player, CreateMoveDTO moveDTO, HashSet<Field> fields) {
+    public Movement createMove(Gameplay gameplay, Player player, CreateMoveDTO moveDTO, HashSet<Field> fields) {
         Movement move = new Movement();
         move.setDirection(moveDTO.getDirection());
         move.setFields(fields);
         move.setCreated(new Date());
         move.setPlayer(player);
-        move.setBoard(game.getBoard());
+        move.setBoard(gameplay.getBoard());
+        move.setMovementColor(GameUtil.getPlayerColor(gameplay, player));
         return move;
     }
     //FINISHED NEED TO TEST

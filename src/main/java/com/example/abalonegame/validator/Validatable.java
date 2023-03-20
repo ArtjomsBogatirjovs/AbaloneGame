@@ -1,6 +1,7 @@
 package com.example.abalonegame.validator;
 
 import com.example.abalonegame.db.entity.Field;
+import com.example.abalonegame.enums.Color;
 
 import java.util.Set;
 
