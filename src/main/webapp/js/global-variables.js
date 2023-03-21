@@ -1,4 +1,6 @@
 let selectedField = [];
+let gameState;
+let gameStatus;
 const boardColor = "#a8a098";
 const scale = 50;
 const hexagonHeight = scale * Math.cos(Math.PI / 6) * 2;
@@ -20,7 +22,7 @@ const fieldDefinition = {
     i: 5,
 };
 
-let gameState;
+
 
 const socket = new SockJS('/abalone');
 const stompClient = Stomp.over(socket);

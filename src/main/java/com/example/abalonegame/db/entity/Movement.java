@@ -17,14 +17,16 @@ import java.util.Set;
 @AllArgsConstructor
 public class Movement {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id",nullable = false)
     private long id;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(nullable = false)
     private Direction direction;
     @ManyToMany(cascade = CascadeType.PERSIST)
     private Set<Field> fields;
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(nullable = false)
     private Board board;
     @ManyToOne
     @JoinColumn(name = "player_id", nullable = false)

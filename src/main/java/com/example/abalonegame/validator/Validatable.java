@@ -7,5 +7,8 @@ import java.util.Set;
 
 
 public interface Validatable<V> {
-    public void validate(V v, Set<Field> gameBoard);
+    void validate(V v, Set<Field> gameBoard);
+
+    void validate(V v);
+
 }

@@ -81,7 +81,7 @@ public abstract class FieldUtil {
             return board.stream()
                     .filter(field -> field.getCordX() == fieldToFind.getCordX())
                     .filter(field -> field.getCordY() == fieldToFind.getCordY())
-                    .filter(field -> field.getColor() == (fieldToFind.getColor()))//getBall
+                    .filter(field -> field.getColor() == fieldToFind.getColor())
                     .findAny()
                     .orElse(null);
         }
@@ -124,6 +124,7 @@ public abstract class FieldUtil {
                 return field;
             }
         }
+        //theoretically this null not possible
         return null;
     }
     public static boolean isColorMatchFieldsColor(Set<Field> fields, Color color){

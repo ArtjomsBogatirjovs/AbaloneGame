@@ -11,4 +11,7 @@ public class ValidateException  extends RuntimeException{
     public ValidateException(ExceptionMessage message) {
         super(message.getMessage());
     }
+    public ValidateException(Throwable cause, ExceptionMessage enumMessage) {
+        super(enumMessage.getMessage(), cause);
+    }
 }

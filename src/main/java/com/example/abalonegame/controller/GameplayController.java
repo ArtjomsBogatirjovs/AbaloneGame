@@ -25,7 +25,7 @@ import java.util.Set;
 @RestController
 @Slf4j
 @RequestMapping("/game")
-public class GamePlayController {
+public class GameplayController {
     @Autowired
     GameplayService gameplayService;
     @Autowired
@@ -40,12 +40,18 @@ public class GamePlayController {
     @PostMapping("/create")
     public GameDTO start(@RequestBody CreateGameDTO createGameDTO) {
         Player tempPlayer = playerService.getLoggedUser();
-        Board gameplayBoard = boardService.getNewBoard();
+
+        Gameplay gameplay = gameplayService.createGame(tempPlayer, createGameDTO);
+        gameplayService.saveGame(gameplay);
+
+        Board gameBoard = boardService.getNewBoard(gameplay);
+        boardService.saveBoard(gameBoard);
+
+        Set<Field> gameBoardFields = BoardUtil.createGameBoardFields(gameBoard);
+        fieldService.saveGameBoardFields(gameBoardFields);
+
         httpSession.setAttribute("gameId", createGameDTO.getId());
-        Set<Field> gameBoard = BoardUtil.createGameBoardFields(gameplayBoard);
-        fieldService.saveGameBoardFields(gameBoard);
-        Gameplay gameplay = gameplayService.createAndSaveGame(tempPlayer, createGameDTO, gameplayBoard);
-        return gameplayService.createGameDTO(gameplay,gameBoard);
+        return gameplayService.createGameDTO(gameplay, gameBoardFields);
     }
 
     @RequestMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -67,7 +73,8 @@ public class GamePlayController {
     public GameDTO getGameProperties(@PathVariable Long id) {
         httpSession.setAttribute("gameId", id);
         Gameplay gameplay = gameplayService.getGameplay(id);
-        Set<Field> gameBoard = fieldService.getGameBoardFields(gameplay.getBoard());
-        return gameplayService.createGameDTO(gameplay, gameBoard);
+        Board gameBoard = boardService.getGameplayBoard(gameplay);
+        Set<Field> gameBoardFields = fieldService.getGameBoardFields(gameBoard);
+        return gameplayService.createGameDTO(gameplay, gameBoardFields);
     }
 }

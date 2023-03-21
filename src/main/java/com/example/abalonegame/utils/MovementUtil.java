@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static com.example.abalonegame.db.entity.Board.BOARD_SIZE;
+
 public abstract class MovementUtil {
     public final static int MAX_MOVEMENT_FIELD_AMOUNT = 3;
     public final static int MIN_BALLS_TO_SUMITO = 2;
@@ -87,36 +89,71 @@ public abstract class MovementUtil {
         }
         return false;
     }
-    public static boolean isNeedToMoveBallWithSameColor(Movement movement, Set<Field> gameBoard){
+
+    public static boolean isNeedToMoveBallWithSameColor(Movement movement, Set<Field> gameBoard) {
         Set<Field> movementFields = movement.getFields();
         Direction direction = movement.getDirection();
 
         int xDir = direction.getX();
         int yDir = direction.getY();
 
-        for(Field field : movementFields){
-            Field tempField = FieldUtil.findSameFieldOnBoard(field,gameBoard);
-            Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(tempField.getCordX()+ xDir,tempField.getCordY() + yDir,gameBoard);
-            if(movement.getMovementColor().equals(fieldToMove.getColor()) && !movementFields.contains(fieldToMove)){
+        Field lastFieldInChain = FieldUtil.getLastFieldInChain(direction, movementFields);
+        for (int i = 1; i < BOARD_SIZE; i++) {
+            Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(lastFieldInChain.getCordX() + xDir * i, lastFieldInChain.getCordY() + yDir * i, gameBoard);
+            if (fieldToMove.getColor() == null) {
+                return false;
+            }
+            if (fieldToMove.getColor().equals(lastFieldInChain.getColor()) && !movementFields.contains(fieldToMove)) {
                 return true;
             }
         }
         return false;
     }
-    public static boolean isMoveToDropField(Movement movement, Set<Field> gameBoard){
+
+    public static boolean isMoveToDropField(Movement movement, Set<Field> gameBoard) {
         Set<Field> movementFields = movement.getFields();
         Direction direction = movement.getDirection();
 
         int xDir = direction.getX();
         int yDir = direction.getY();
 
-        for(Field field : movementFields){
-            Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(field.getCordX()+ xDir,field.getCordY() + yDir,gameBoard);
-            if(fieldToMove.isDropField()){
+        for (Field field : movementFields) {
+            Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(field.getCordX() + xDir, field.getCordY() + yDir, gameBoard);
+            if (fieldToMove.isDropField()) {
                 return true;
             }
         }
         return false;
+    }
+
+    public static Color detectFieldsColor(Set<Field> fields) {
+        ArrayList<Field> tempArray = new ArrayList<>(fields);
+        if (tempArray.size() == 1) {
+            return tempArray.get(0).getColor();
+        }
+        for (int i = 0; i < tempArray.size() - 1; i++) {
+            Color fieldColor = tempArray.get(i).getColor();
+
+            for (int j = i + 1; j < tempArray.size(); j++) {
+                Color otherFieldColor = tempArray.get(j).getColor();
+                if (fieldColor == null || otherFieldColor == null) {
+                    if (fieldColor != otherFieldColor) {
+                        //throw new ValidateException(ExceptionMessage.DIFFERENT_COLORS);
+                        return null;
+                    }
+                } else if (!fieldColor.equals(otherFieldColor)) {
+                    //throw new ValidateException(ExceptionMessage.DIFFERENT_COLORS);
+                    return null;
+                }
+                if (i == tempArray.size() - 2 && i + 1 == j) {
+                    return fieldColor;
+                }
+            }
+        }
+        return null;
+    }
+    public static boolean isMovementsSameColor(Movement moveOne,Movement moveTwo){
+        return moveOne.getMovementColor().equals(moveTwo.getMovementColor());
     }
 }
 

@@ -1,7 +1,6 @@
 package com.example.abalonegame.exception;
 
 public class InternalException extends RuntimeException{
-    private ExceptionMessage enumMessage;
     public InternalException() {
         super("Unknown error");
     }
@@ -15,6 +14,5 @@ public class InternalException extends RuntimeException{
 
     public InternalException(Throwable cause, ExceptionMessage enumMessage) {
         super(enumMessage.getMessage(), cause);
-        this.enumMessage = enumMessage;
     }
 }

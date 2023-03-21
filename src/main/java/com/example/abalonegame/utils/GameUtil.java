@@ -99,7 +99,7 @@ public abstract class GameUtil {
         if (player.equals(gameplay.getPlayerOne())) {
             return gameplay.getFirstPlayerColor();
         } else {
-            return gameplay.getFirstPlayerColor() == Color.BLACK ? Color.WHITE : Color.BLACK;
+            return gameplay.getSecondPlayerColor();
         }
     }
 

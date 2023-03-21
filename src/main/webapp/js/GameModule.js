@@ -26,9 +26,14 @@ gameModule.controller('newGameController', ['$rootScope', '$scope', '$http', '$l
                     'Content-Type': 'application/json; charset=UTF-8'
                 }
             }).then(function (data) {
+                console.log(data)
                 rootScope.gameId = data.data.gameId;
                 location.path('/game/' + rootScope.gameId);
-            }).catch(function () {
+            }).catch(function (data) {
+                Swal.fire({
+                    icon: 'error',
+                    title: data.data.message,
+                })
                 location.path('/player/panel');
             });
         }
@@ -91,8 +96,8 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
                         'Content-Type': 'application/json; charset=UTF-8'
                     }
                 }).then(function (data) {
-                    initGameParams();
-
+                    initGameParams(data.data);
+                    console.log(data.data);
                     //getNextMove();
                     stompClient.send('/topic/movement/' + routeParams.id, {}, "lol")
                 }).catch(function (data) {
@@ -125,7 +130,6 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
             }
         }
 
-
         scope.setDirection = function (dirX = 0, dirY = 0) {
             direction.x = dirX;
             direction.y = dirY;
@@ -146,17 +150,18 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
             } else if (x === 1 && y === 1) {
                 return "\u2198";
             } else if (x === 0 && y === -1) {
-                return "\u2199";
-            } else if (x === 0 && y === 1) {
-                return "\u2197";
-            } else if (x === -1 && y === 0) {
                 return "\u2191";
-            } else if (x === 1 && y === 0) {
+            } else if (x === 0 && y === 1) {
                 return "\u2193";
+            } else if (x === -1 && y === 0) {
+                return "\u2199";
+            } else if (x === 1 && y === 0) {
+                return "\u2197";
             }
         }
 
-        function initGameParams() {
+        function initGameParams(newGameStatus) {
+            gameStatus = newGameStatus;
             http.get('/game/' + routeParams.id).then(function (data) {
                 initGameBoard(data.data.ballsCords);
             }).catch(function (data) {

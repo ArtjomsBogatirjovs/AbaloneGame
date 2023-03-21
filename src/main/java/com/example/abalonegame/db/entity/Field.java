@@ -16,7 +16,7 @@ import javax.persistence.*;
 public class Field {
     public final static int DROP_FIELD = 0;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
     private long id;
     @Enumerated(EnumType.STRING)

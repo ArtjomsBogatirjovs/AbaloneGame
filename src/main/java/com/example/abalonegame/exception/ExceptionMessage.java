@@ -2,8 +2,10 @@ package com.example.abalonegame.exception;
 
 public enum ExceptionMessage {
     NOT_FOUND("Game not created before, please create new game!"),
+    DIFFERENT_COLORS("Can't detect color in fields with different colors!"),
     COLOR_MISMATCH("You can't move opponent ball"),
     MOVE_ONLY_OTHER_COLOR("You can't push your balls!"),
+    GAME_TYPE_NULL("Please select game type!"),
     FINISHED("Game was already finished!"),
     WRONG_AMOUNT("Illegal ball amount! Please select from 1 to 3 balls!"),
     NOT_ROW("The balls not in one row!"),

@@ -15,6 +15,7 @@ import static com.example.abalonegame.db.entity.Field.DROP_FIELD;
 
 public abstract class BoardUtil {
     public static int BALLS_TO_LOSE = 8;
+    public static String GAME_ID_ATTRIBUTE = "gameId";
 
     public static Set<Field> createGameBoardFields(Board board) {
         Set<Field> gameBoard = new HashSet<>();
@@ -46,22 +47,22 @@ public abstract class BoardUtil {
         return gameBoard;
     }
 
-    public static Set<Field> makeMove(Set<Field> gameBoard, Movement move) {
-        Set<Field> fieldsToMove = move.getFields();
+    public static void makeMove(Set<Field> gameBoard, Movement move) {
+        Set<Field> movementFields = move.getFields();
         Direction direction = move.getDirection();
 
-        if (fieldsToMove == null || fieldsToMove.isEmpty() || direction == null) {
+        if (movementFields == null || movementFields.isEmpty() || direction == null) {
             throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
         }
 
         int xDirection = direction.getX();
         int yDirection = direction.getY();
 
-        Field lastFieldInChain = FieldUtil.getLastFieldInChain(direction, fieldsToMove);
-
+        Field lastFieldInChain = FieldUtil.getLastFieldInChain(direction, movementFields);
         Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(lastFieldInChain.getCordX() + xDirection, lastFieldInChain.getCordY() + yDirection, gameBoard);
-        if (fieldToMove.getColor() == null) { //getBall
-            for (Field f : fieldsToMove) {
+
+        if (fieldToMove.getColor() == null) {
+            for (Field f : movementFields) {
                 Field tempField = FieldUtil.findSameFieldOnBoard(f, gameBoard);
                 fieldToMove = FieldUtil.findFieldOnBoardByCoords(f.getCordX() + xDirection, f.getCordY() + yDirection, gameBoard);
                 if (!FieldUtil.transferBall(tempField, fieldToMove)) {
@@ -69,24 +70,24 @@ public abstract class BoardUtil {
                 }
             }
         }
-        if (fieldsToMove.contains(fieldToMove)) {
-            Field firstEmptyFieldInDirection = FieldUtil.getFirstEmptyFieldInDirection(gameBoard, lastFieldInChain, direction);
+
+        if (movementFields.contains(fieldToMove)) {
+            Field tempField = FieldUtil.getFirstEmptyFieldInDirection(gameBoard, lastFieldInChain, direction);
             xDirection *= -1;
             yDirection *= -1;
             for (int i = 0; i < BOARD_SIZE; i++) {
-                fieldToMove = FieldUtil.findFieldOnBoardByCoords(firstEmptyFieldInDirection.getCordX() + xDirection, firstEmptyFieldInDirection.getCordY() + yDirection, gameBoard);
-                if (FieldUtil.getLastFieldInChain(direction, fieldsToMove).equals(fieldToMove)) {
-                    if (FieldUtil.transferBall(fieldToMove, firstEmptyFieldInDirection)) {
-                        return gameBoard;
+                fieldToMove = FieldUtil.findFieldOnBoardByCoords(tempField.getCordX() + xDirection, tempField.getCordY() + yDirection, gameBoard);
+                if (FieldUtil.getLastFieldInChain(direction, movementFields).equals(fieldToMove)) {
+                    if (FieldUtil.transferBall(fieldToMove, tempField)) {
+                        break;
                     } else {
                         throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
                     }
                 }
-                FieldUtil.transferBall(fieldToMove, firstEmptyFieldInDirection);
-                firstEmptyFieldInDirection = fieldToMove;
+                FieldUtil.transferBall(fieldToMove, tempField);
+                tempField = fieldToMove;
             }
         }
-        return gameBoard;
     }
 
     public static Map<Color, ArrayList<String>> convertGameBoardToResponse(Set<Field> gameBoard) {

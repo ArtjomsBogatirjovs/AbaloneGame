@@ -18,7 +18,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class Player {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(name = "id", nullable = false)
     private int id;
     @Column(name = "name", unique = true, nullable = false)

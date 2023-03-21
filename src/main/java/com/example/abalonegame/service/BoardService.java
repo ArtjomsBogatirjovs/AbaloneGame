@@ -16,10 +16,16 @@ public class BoardService { //TODO custom board create
         this.boardRepository = boardRepository;
     }
 
-    public Board getNewBoard() {
+    public Board getNewBoard(Gameplay gameplay) {
         Board board = new Board();
-        boardRepository.save(board);
+        board.setGameplay(gameplay);
         return board;
+    }
+    public void saveBoard(Board board){
+        boardRepository.save(board);
+    }
+    public Board getGameplayBoard(Gameplay gameplay){
+        return boardRepository.findByGameplay(gameplay);
     }
 
 }

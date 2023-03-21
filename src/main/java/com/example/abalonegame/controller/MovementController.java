@@ -1,13 +1,9 @@
 package com.example.abalonegame.controller;
 
 import com.example.abalonegame.db.entity.*;
-import com.example.abalonegame.dto.GameDTO;
 import com.example.abalonegame.dto.MoveDTO;
 import com.example.abalonegame.dto.CreateMoveDTO;
-import com.example.abalonegame.enums.Coordinates;
-import com.example.abalonegame.enums.FieldCoordinates;
 import com.example.abalonegame.enums.GameStatus;
-import com.example.abalonegame.enums.GameType;
 import com.example.abalonegame.service.*;
 import com.example.abalonegame.utils.BoardUtil;
 import com.example.abalonegame.utils.GameUtil;
@@ -39,41 +35,41 @@ public class MovementController {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public GameStatus createMove(@RequestBody MoveDTO moveDTO) {
-        Long gameId = (Long) httpSession.getAttribute("gameId");
+        Long gameId = (Long) httpSession.getAttribute(BoardUtil.GAME_ID_ATTRIBUTE);
         Gameplay gameplay = gameplayService.getGameplay(gameId);
         Player currentPlayer = playerService.getLoggedUser();
-        Board board = gameplay.getBoard();
+        Board board = boardService.getGameplayBoard(gameplay);
 
-        ArrayList<Map<Coordinates, FieldCoordinates>> tempFieldCords = GameUtil.resolveCoordinateList(moveDTO.getFieldCords());
-        ArrayList<Field> fieldsToMove = fieldService.findFieldsFromMaps(tempFieldCords, board);
+        ArrayList<Field> fieldsToMove = fieldService.findFieldByCords(moveDTO.getFieldCords(), board);
         Set<Field> gameBoardFields = fieldService.getGameBoardFields(board);
 
-        Movement movement = movementService.createMove(gameplay, currentPlayer, moveDTO, new HashSet<>(fieldsToMove));
-        if(gameplay.getGameType().equals(GameType.LOCAL)){
-            movementService.saveMovement(movement,gameBoardFields);//TODO DELETE
-        } else {
-            movementService.validateAndSave(movement, gameBoardFields);
-        }
+        Movement movement = movementService
+                .createMove(board, currentPlayer, gameplay, moveDTO, new HashSet<>(fieldsToMove));
 
-        gameBoardFields = BoardUtil.makeMove(gameBoardFields, movement);
-        GameStatus tempStatus = BoardUtil.checkIfPlayerWin(gameBoardFields,gameplay);
+        gameplayService.validate(gameplay);
+        movementService.validateAndSave(movement, gameBoardFields);
+
+        BoardUtil.makeMove(gameBoardFields, movement);
         fieldService.saveGameBoardFields(gameBoardFields);
+
+        GameStatus tempStatus = BoardUtil.checkIfPlayerWin(gameBoardFields, gameplay);
         gameplayService.updateGameStatus(gameplay, tempStatus);
-        gameplayService.validate(gameplay,gameBoardFields);
         return gameplay.getStatus();
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<CreateMoveDTO> getMovesInGame() {
-        Long gameId = (Long) httpSession.getAttribute("gameId");
-        return movementService.getMovesInGame(gameplayService.getGameplay(gameId));
+        Long gameId = (Long) httpSession.getAttribute(BoardUtil.GAME_ID_ATTRIBUTE);
+        Gameplay gameplay = gameplayService.getGameplay(gameId);
+        Board board = boardService.getGameplayBoard(gameplay);
+        return movementService.getMovesInGame(board);
     }
 
     @RequestMapping(value = "/turn", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public boolean isPlayerTurn() {
-        Long gameId = (Long) httpSession.getAttribute("gameId");
+        Long gameId = (Long) httpSession.getAttribute(BoardUtil.GAME_ID_ATTRIBUTE);
         Gameplay currentGame = gameplayService.getGameplay(gameId);
-        Board currentBoard = currentGame.getBoard();
+        Board currentBoard = boardService.getGameplayBoard(currentGame);
         Movement lastMovement = movementService.getLastMovement(currentBoard);
         Player currentPlayer = playerService.getLoggedUser();
         return GameUtil.isPlayerTurn(

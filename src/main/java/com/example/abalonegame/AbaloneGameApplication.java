@@ -20,9 +20,9 @@ public class AbaloneGameApplication {
         return (args) -> {
 
 //            save a couple of players
-           //playerRepository.deleteAll();
-          /// playerRepository.save(new Player("Player1", new BCryptPasswordEncoder().encode("1")));
-           //playerRepository.save(new Player("Player2", new BCryptPasswordEncoder().encode("1")));
+//            playerRepository.deleteAll();
+//            playerRepository.save(new Player("Player1", new BCryptPasswordEncoder().encode("1")));
+//            playerRepository.save(new Player("Player2", new BCryptPasswordEncoder().encode("1")));
         };
     }
 }

@@ -77,10 +77,10 @@
                 <tr ng-repeat="game in playerGames">
                     <td>{{game.playerOne.name}}</td>
                     <td>
-                        <span ng-if="!game.player.name && game.gameType != 'PvP'">
+                        <span ng-if="game.gameType == 'PvE' ">
                             COMPUTER
                         </span>
-                        <span ng-if="game.player.name != ''">
+                        <span ng-if="game.playerTwo.name != ''">
                             {{game.playerTwo.name}}
                         </span>
                     </td>

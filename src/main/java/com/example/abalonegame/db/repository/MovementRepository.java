@@ -12,7 +12,12 @@ import java.util.List;
 public interface MovementRepository extends CrudRepository<Movement, Long> {
 
     List<Movement> findByBoard(Board board);
+
+    List<Movement> findByBoardOrderByCreatedDesc(Board board);
+
     List<Movement> findByBoardAndPlayer(Board board, Player player);
+
     int countByBoardAndPlayer(Board game, Player player);
+
     Movement findFirstByBoardOrderByCreatedDesc(Board board);
 }

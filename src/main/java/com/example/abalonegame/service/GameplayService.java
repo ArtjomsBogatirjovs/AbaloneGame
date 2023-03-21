@@ -7,12 +7,14 @@ import com.example.abalonegame.db.entity.Player;
 import com.example.abalonegame.db.repository.GameplayRepository;
 import com.example.abalonegame.dto.CreateGameDTO;
 import com.example.abalonegame.dto.GameDTO;
+import com.example.abalonegame.enums.Color;
 import com.example.abalonegame.enums.GameStatus;
 import com.example.abalonegame.enums.GameType;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.NotFoundException;
 import com.example.abalonegame.utils.BoardUtil;
 import com.example.abalonegame.validator.GameplayValidator;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,20 +34,19 @@ public class GameplayService extends GameplayValidator {
         this.gameplayRepository = gameRepository;
     }
 
-    public Gameplay createAndSaveGame(Player player, CreateGameDTO createGameDTO, Board gameBoard) {
+    public Gameplay createGame(Player player, CreateGameDTO createGameDTO) {
         Gameplay gameplay = new Gameplay();
+        GameType gameType = createGameDTO.getGameType();
         gameplay.setPlayerOne(player);
-        gameplay.setGameType(createGameDTO.getGameType());
-        gameplay.setFirstPlayerColor(createGameDTO.getColor());
-        gameplay.setStatus(createGameDTO.getGameType() == GameType.PvE ? GameStatus.IN_PROGRESS :
-                GameStatus.WAITS_FOR_PLAYER);
-        gameplay.setCreated(new Date());
-        gameplay.setBoard(gameBoard);
-        if(createGameDTO.getGameType().equals(GameType.LOCAL)){
+        if (GameType.LOCAL.equals(gameType)) { //TODO THINK ABOUT IT
             gameplay.setPlayerTwo(player);
-            gameplay.setStatus(GameStatus.IN_PROGRESS);
         }
-        gameplayRepository.save(gameplay);
+        gameplay.setFirstPlayerColor(createGameDTO.getColor());
+        gameplay.setSecondPlayerColor(createGameDTO.getColor() == Color.WHITE? Color.BLACK : Color.WHITE);
+        gameplay.setGameType(createGameDTO.getGameType());
+        gameplay.setStatus(createGameDTO.getGameType() == GameType.PvP ? GameStatus.WAITS_FOR_PLAYER : GameStatus.IN_PROGRESS);
+        gameplay.setCreated(new Date());
+        validate(gameplay);
         return gameplay;
     }
 
@@ -61,7 +62,7 @@ public class GameplayService extends GameplayValidator {
         Gameplay gameplay = getGameplay(createGameDTO.getId());
         gameplay.setPlayerTwo(player);
         gameplay.setStatus(GameStatus.IN_PROGRESS);
-        gameplayRepository.save(gameplay);
+        gameplayRepository.save(gameplay); //TODO TO DIFFERENT PLACE
         return gameplay;
     }
 
@@ -91,5 +92,10 @@ public class GameplayService extends GameplayValidator {
             gameplay.setStatus(status);
             gameplayRepository.save(gameplay);
         }
+        validate(gameplay);
+    }
+
+    public void saveGame(Gameplay gameplay) {
+        gameplayRepository.save(gameplay);
     }
 }
