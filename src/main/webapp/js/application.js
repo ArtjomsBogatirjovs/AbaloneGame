@@ -3,7 +3,7 @@ const socket = new SockJS('/abalone');
 const stompClient = Stomp.over(socket);
 
 abalone.config(['$routeProvider', function ($routeProvider) {
-    $routeProvider.when('#/about', {
+    $routeProvider.when('/about', {
         templateUrl: 'templates/about.html'
     }).when('/player/create', {
         templateUrl: 'templates/create.html',

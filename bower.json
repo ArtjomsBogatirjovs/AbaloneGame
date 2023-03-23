@@ -1,7 +1,7 @@
 {
   "name": "abalone",
-  "description": "",
-  "main": "",
+  "description": "Abalone implemented in Spring Boot and Angular JS",
+  "main": "index.html",
   "authors": [
     "arbog <ar.bogatirjovs@gmail.com>"
   ],
