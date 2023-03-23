@@ -1,7 +1,6 @@
 const gameModule = angular.module('gameModule', []);
 
 gameModule.controller('newGameController', ['$rootScope', '$scope', '$http', '$location',
-
     function (rootScope, scope, http, location) {
         rootScope.gameId = null;
         scope.newGameData = null;
@@ -26,7 +25,6 @@ gameModule.controller('newGameController', ['$rootScope', '$scope', '$http', '$l
                     'Content-Type': 'application/json; charset=UTF-8'
                 }
             }).then(function (data) {
-                console.log(data)
                 rootScope.gameId = data.data.gameId;
                 location.path('/game/' + rootScope.gameId);
             }).catch(function (data) {
@@ -88,7 +86,6 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         initGameParams();
 
         function makePlayerMove() {
-
             const parameters = {'fieldCords': selectedField, 'direction': direction}
             http.get('/move/turn').then(function () {
                 http.post("/move/create", parameters, {
@@ -97,7 +94,6 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
                     }
                 }).then(function (data) {
                     initGameParams(data.data);
-                    console.log(data.data);
                     //getNextMove();
                     stompClient.send('/topic/movement/' + routeParams.id, {}, "lol")
                 }).catch(function (data) {

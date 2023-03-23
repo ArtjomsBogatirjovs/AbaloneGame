@@ -1,6 +1,8 @@
 let selectedField = [];
+let historyInfo = [];
 let gameState;
 let gameStatus;
+let user;
 const boardColor = "#a8a098";
 const scale = 50;
 const hexagonHeight = scale * Math.cos(Math.PI / 6) * 2;
@@ -21,26 +23,20 @@ const fieldDefinition = {
     h: 6,
     i: 5,
 };
+const fieldEnum= {
+    1: 'a',
+    2: 'b',
+    3: 'c',
+    4: 'd',
+    5: 'e',
+    6: 'f',
+    7: 'g',
+    8: 'h',
+    9: 'i',
+};
 
 
 
-const socket = new SockJS('/abalone');
-const stompClient = Stomp.over(socket);
 
-function subscribe(topic,callback){
-    const connected = stompClient.connected;
-    if(connected){
-        subscribeToTopic(topic,callback);
-        return;
-    }
-    stompClient.connect({},function (){
-        subscribeToTopic(topic,callback);
-    });
-}
-function subscribeToTopic(topic, callback){
-    stompClient.subscribe(topic, function () {
-        callback();
-    })
-}
 
 

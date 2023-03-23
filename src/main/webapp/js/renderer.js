@@ -49,13 +49,13 @@ const board = {
         relativeY += hexagonHeight / 2;
         ctx.beginPath();
         ctx.moveTo(relativeX, relativeY);
-        ctx.lineTo(relativeX  + scale, relativeY);
-         ctx.lineTo(relativeX + 1.5 * scale, relativeY + hexagonHeight / 2);
-         ctx.lineTo(relativeX + 1 * scale, relativeY + hexagonHeight);
-         ctx.lineTo(relativeX + 0, relativeY + hexagonHeight);
-         ctx.lineTo(relativeX - 0.5 * scale, relativeY + hexagonHeight / 2);
+        ctx.lineTo(relativeX + scale, relativeY);
+        ctx.lineTo(relativeX + 1.5 * scale, relativeY + hexagonHeight / 2);
+        ctx.lineTo(relativeX + 1 * scale, relativeY + hexagonHeight);
+        ctx.lineTo(relativeX + 0, relativeY + hexagonHeight);
+        ctx.lineTo(relativeX - 0.5 * scale, relativeY + hexagonHeight / 2);
         ctx.closePath();
         ctx.fill();
-    }
+    },
 }
 

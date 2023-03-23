@@ -1,9 +1,9 @@
 package com.example.abalonegame.utils;
 
-import com.example.abalonegame.db.entity.Direction;
-import com.example.abalonegame.db.entity.Field;
-import com.example.abalonegame.db.entity.Movement;
+import com.example.abalonegame.db.entity.*;
 import com.example.abalonegame.enums.Color;
+import com.example.abalonegame.exception.ExceptionMessage;
+import com.example.abalonegame.exception.ValidateException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,13 +137,13 @@ public abstract class MovementUtil {
             for (int j = i + 1; j < tempArray.size(); j++) {
                 Color otherFieldColor = tempArray.get(j).getColor();
                 if (fieldColor == null || otherFieldColor == null) {
-                    if (fieldColor != otherFieldColor) {
-                        //throw new ValidateException(ExceptionMessage.DIFFERENT_COLORS);
-                        return null;
+                    if (fieldColor == otherFieldColor) {
+                        return fieldColor;
+                    } else {
+                        throw new ValidateException(ExceptionMessage.DIFFERENT_COLORS);
                     }
                 } else if (!fieldColor.equals(otherFieldColor)) {
-                    //throw new ValidateException(ExceptionMessage.DIFFERENT_COLORS);
-                    return null;
+                    throw new ValidateException(ExceptionMessage.DIFFERENT_COLORS);
                 }
                 if (i == tempArray.size() - 2 && i + 1 == j) {
                     return fieldColor;
@@ -152,8 +152,26 @@ public abstract class MovementUtil {
         }
         return null;
     }
-    public static boolean isMovementsSameColor(Movement moveOne,Movement moveTwo){
+
+    public static boolean isMovementsSameColor(Movement moveOne, Movement moveTwo) {
+        if (moveOne == moveTwo) {
+            return true;
+        }
+        if (moveOne == null || moveTwo == null) {
+            return false;
+        }
         return moveOne.getMovementColor().equals(moveTwo.getMovementColor());
+    }
+
+    public static Color getMovementColor(Gameplay gameplay, Player player, Set<Field> fields, Movement lastMovement) {
+        if (gameplay.getPlayerOne().equals(gameplay.getPlayerTwo())) {
+            if (lastMovement == null) {
+                return gameplay.getFirstPlayerColor();
+            } else {
+                return MovementUtil.detectFieldsColor(fields);
+            }
+        }
+        return GameUtil.getPlayerColor(gameplay, player);
     }
 }
 

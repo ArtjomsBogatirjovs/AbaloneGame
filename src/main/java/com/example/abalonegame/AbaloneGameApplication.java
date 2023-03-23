@@ -23,6 +23,7 @@ public class AbaloneGameApplication {
 //            playerRepository.deleteAll();
 //            playerRepository.save(new Player("Player1", new BCryptPasswordEncoder().encode("1")));
 //            playerRepository.save(new Player("Player2", new BCryptPasswordEncoder().encode("1")));
+//            playerRepository.save(new Player("AI", new BCryptPasswordEncoder().encode("gb34r12vfwfc23cx23f")));
         };
     }
 }

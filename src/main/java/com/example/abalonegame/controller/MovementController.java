@@ -8,7 +8,6 @@ import com.example.abalonegame.service.*;
 import com.example.abalonegame.utils.BoardUtil;
 import com.example.abalonegame.utils.GameUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -65,7 +64,7 @@ public class MovementController {
         return movementService.getMovesInGame(board);
     }
 
-    @RequestMapping(value = "/turn", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/turn", method = RequestMethod.GET)
     public boolean isPlayerTurn() {
         Long gameId = (Long) httpSession.getAttribute(BoardUtil.GAME_ID_ATTRIBUTE);
         Gameplay currentGame = gameplayService.getGameplay(gameId);

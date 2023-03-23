@@ -1,9 +1,7 @@
 package com.example.abalonegame.config;
 
 
-import com.example.abalonegame.db.repository.PlayerRepository;
-import com.example.abalonegame.security.UserDetailsServiceImpl;
-import lombok.Builder;
+import com.example.abalonegame.security.PlayerDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -15,19 +13,19 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 
 /**
- * Created by pdybka on 15.06.16.
+ * Created by Artjoms Bogatirjovs
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private PlayerRepository playerRepository;
+    private PlayerDetailsService playerDetailsService;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .userDetailsService(new UserDetailsServiceImpl(playerRepository))
+                .userDetailsService(playerDetailsService)
                 .passwordEncoder(new BCryptPasswordEncoder());
     }
 
@@ -47,7 +45,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .clearAuthentication(true)
                 .logoutRequestMatcher
                         (new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/login?logout")
                 .permitAll().and()
                 .csrf().disable();
     }

@@ -14,11 +14,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 
 @Component
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class PlayerDetailsService implements UserDetailsService {
     private final PlayerRepository playerRepository;
 
     @Autowired
-    public UserDetailsServiceImpl(PlayerRepository playerRepository) {
+    public PlayerDetailsService(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
     }
 

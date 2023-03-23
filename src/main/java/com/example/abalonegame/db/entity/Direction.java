@@ -16,8 +16,6 @@ public class Direction {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
-//    @OneToOne(cascade = CascadeType.ALL)
-//    private Movement move;
     @Column(name = "x")
     private Integer x;
     @Column(name = "y")

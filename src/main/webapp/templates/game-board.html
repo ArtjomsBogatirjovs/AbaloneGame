@@ -1,6 +1,6 @@
 <head>
     <title>Gameplay</title>
-    <link rel="stylesheet" type="text/css" media="screen" href="css/game-board.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="../css/game-board.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 </head>
@@ -21,7 +21,7 @@
 
     <div class="col-md-6">
         <div>
-            <table class="table table-hover table-striped table-condensed" ng-show="movesInGame.length">
+            <table onmouseleave="board.drawGameState()" class="table table-hover table-striped table-condensed" ng-show="movesInGame.length">
                 <h2 class="lead">History of moves in the game</h2>
                 <thead>
                 <td>Player</td>
@@ -31,13 +31,13 @@
                 <td>Move created</td>
                 </thead>
                 <tbody>
-                <tr ng-repeat="move in movesInGame">
-                    <td>{{move.playerName}}</td>
-                    <td><img src="assets/ball-{{move.playerColor}}.svg" alt="Description of the image"
+                <tr onmouseenter={showInfo(event)} onmouseleave="hideInfo()" ng-repeat="movement in movesInGame">
+                    <td>{{movement.playerName}}</td>
+                    <td><img src="assets/ball-{{movement.playerColor}}.svg" alt="Description of the image"
                              width="25" height="25"></td>
-                    <td>{{getFieldsCords(move.fields)}}</td>
-                    <td>{{getDirectionArrow( move.direction.x, move.direction.y)}}</td>
-                    <td>{{move.created | date:'dd-MM-yyyy HH:mm:ss'}}</td>
+                    <td>{{getFieldsCords(movement.fields)}}</td>
+                    <td>{{getDirectionArrow(movement.direction.x, movement.direction.y)}}</td>
+                    <td>{{movement.created | date:'dd-MM-yyyy HH:mm:ss'}}</td>
                 </tr>
                 </tbody>
             </table>
