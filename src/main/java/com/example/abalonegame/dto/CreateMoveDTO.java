@@ -1,8 +1,8 @@
 package com.example.abalonegame.dto;
 
-import com.example.abalonegame.db.entity.Direction;
 import com.example.abalonegame.db.entity.Field;
 import com.example.abalonegame.enums.Color;
+import com.example.abalonegame.enums.Direction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

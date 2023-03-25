@@ -50,11 +50,9 @@ function showInfo(event) {
         let selectedHexagon = hexagons[cord];
         board.drawHexagon(selectedHexagon.x, selectedHexagon.y, "#198db7");
         var arrow = event.target.children[3].innerText;
-        console.log(arrow)
 
         ctx.font = "bold 50px Arial";
         ctx.fillStyle = "black";
-
         ctx.fillText(
             arrow,
             hexagons[cord].x + hexagonWidth * 2,

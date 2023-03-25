@@ -4,12 +4,7 @@ package com.example.abalonegame.service;
 import static org.mockito.Mockito.mock;
 
 class BoardServiceTest {
-//    private final static Ball W = new Ball(Color.WHITE);
-//    private final static Ball B = new Ball(Color.BLACK);
-//
-//    private BoardService boardService;
-//    private BoardRepository boardRepository ;
-//    private final Board mockBoard = mock(Board.class);
+
 //    Field[][] gameBoard = {
 //            {new Field(0, 0,true), new Field(1, 0,true), new Field(2, 0,true), new Field(3, 0,true), new Field(4, 0,true), new Field(5, 0,true), new Field(6, 0,true), new Field(7, 0,true), new Field(8, 0,true), new Field(9, 0,true), new Field(10, 0,true)}, //0
 //            //null                                  //A                                 //B                     //C                             //D                         //E                             //F                             //G                                 //H                             //I          /                      /null

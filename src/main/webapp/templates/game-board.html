@@ -21,7 +21,8 @@
 
     <div class="col-md-6">
         <div>
-            <table onmouseleave="board.drawGameState()" class="table table-hover table-striped table-condensed" ng-show="movesInGame.length">
+            <table onmouseleave="board.drawGameState()" class="table table-hover table-striped table-condensed"
+                   ng-show="movesInGame.length">
                 <h2 class="lead">History of moves in the game</h2>
                 <thead>
                 <td>Player</td>
@@ -36,7 +37,7 @@
                     <td><img src="assets/ball-{{movement.playerColor}}.svg" alt="Description of the image"
                              width="25" height="25"></td>
                     <td>{{getFieldsCords(movement.fields)}}</td>
-                    <td>{{getDirectionArrow(movement.direction.x, movement.direction.y)}}</td>
+                    <td>{{getDirectionArrow(movement.direction)}}</td>
                     <td>{{movement.created | date:'dd-MM-yyyy HH:mm:ss'}}</td>
                 </tr>
                 </tbody>

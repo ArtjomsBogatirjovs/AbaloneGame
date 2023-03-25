@@ -1,9 +1,6 @@
 package com.example.abalonegame.db.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -16,6 +13,7 @@ import javax.persistence.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
@@ -25,6 +23,7 @@ public class Player {
     private String name;
     @Column(name = "password", nullable = false)
     private String password;
+
     public Player(String name, String password) {
         this.name = name;
         this.password = password;

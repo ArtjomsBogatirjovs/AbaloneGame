@@ -1,6 +1,5 @@
 package com.example.abalonegame.dto;
 
-import com.example.abalonegame.db.entity.Direction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MoveDTO {
-    ArrayList<String> fieldCords;
-    Direction direction;
+    private ArrayList<String> fieldCords;
+    private int x;
+    private int y;
 }

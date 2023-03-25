@@ -1,16 +1,14 @@
 package com.example.abalonegame.service;
 
-
 import com.example.abalonegame.db.entity.*;
 import com.example.abalonegame.db.repository.MovementRepository;
-import com.example.abalonegame.dto.MoveDTO;
 import com.example.abalonegame.dto.CreateMoveDTO;
 import com.example.abalonegame.enums.Color;
+import com.example.abalonegame.enums.Direction;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.IllegalMovementException;
 import com.example.abalonegame.exception.ValidateException;
 import com.example.abalonegame.utils.FieldUtil;
-import com.example.abalonegame.utils.GameUtil;
 import com.example.abalonegame.utils.MovementUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,17 +27,23 @@ public class MovementService {
         this.movementRepository = movementRepository;
     }
 
-    //FINISHED
-    public Movement createMove(Board board, Player player, Gameplay gameplay, MoveDTO moveDTO, HashSet<Field> fields) {
-        Movement move = new Movement();
-        move.setDirection(moveDTO.getDirection());
-        move.setFields(fields);
-        move.setCreated(new Date());
-        move.setPlayer(player);
-        move.setBoard(board);
+    public Movement createMove(Board board, Player player, Gameplay gameplay, Direction direction, Set<Field> fields) {
         Color color = MovementUtil.getMovementColor(gameplay, player, fields, getLastMovement(board));
+
+        Movement move = new Movement();
+        move.setDirection(direction);
+        move.setFields(fields);
         move.setMovementColor(color);
+        if (gameplay != null && player != null && board != null) {
+            move.setCreated(new Date());
+            move.setBoard(board);
+            move.setPlayer(player);
+        }
         return move;
+    }
+
+    public Movement simpleMove(Direction direction, Set<Field> fields) {
+        return createMove(null, null, null, direction, fields);
     }
 
     //FINISHED NEED TO TEST

@@ -2,6 +2,7 @@ package com.example.abalonegame.utils;
 
 import com.example.abalonegame.db.entity.*;
 import com.example.abalonegame.enums.Color;
+import com.example.abalonegame.enums.Direction;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.ValidateException;
 
@@ -33,7 +34,7 @@ public abstract class MovementUtil {
         int xDir = direction.getX();
         int yDir = direction.getY();
         for (Field field : fields) {
-            Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(xDir + field.getCordX(), yDir + field.getCordY(), gameBoard);
+            Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(xDir + field.getX(), yDir + field.getY(), gameBoard);
             if (!fields.contains(fieldToMove)) {
                 if (fieldToMove.getColor() != null) {
                     return true;
@@ -55,8 +56,8 @@ public abstract class MovementUtil {
         int toIterate = fields.size() + maxMoveBall;
 
         Field field = fields.get(0);
-        int x = field.getCordX();
-        int y = field.getCordY();
+        int x = field.getX();
+        int y = field.getY();
 
         Direction direction = move.getDirection();
         int xDir = direction.getX();
@@ -99,7 +100,7 @@ public abstract class MovementUtil {
 
         Field lastFieldInChain = FieldUtil.getLastFieldInChain(direction, movementFields);
         for (int i = 1; i < BOARD_SIZE; i++) {
-            Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(lastFieldInChain.getCordX() + xDir * i, lastFieldInChain.getCordY() + yDir * i, gameBoard);
+            Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(lastFieldInChain.getX() + xDir * i, lastFieldInChain.getY() + yDir * i, gameBoard);
             if (fieldToMove.getColor() == null) {
                 return false;
             }
@@ -118,7 +119,10 @@ public abstract class MovementUtil {
         int yDir = direction.getY();
 
         for (Field field : movementFields) {
-            Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(field.getCordX() + xDir, field.getCordY() + yDir, gameBoard);
+            Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(field.getX() + xDir, field.getY() + yDir, gameBoard);
+            if (fieldToMove == null) {
+                return true;
+            }
             if (fieldToMove.isDropField()) {
                 return true;
             }
@@ -164,6 +168,9 @@ public abstract class MovementUtil {
     }
 
     public static Color getMovementColor(Gameplay gameplay, Player player, Set<Field> fields, Movement lastMovement) {
+        if (gameplay == null) {
+            return MovementUtil.detectFieldsColor(fields);
+        }
         if (gameplay.getPlayerOne().equals(gameplay.getPlayerTwo())) {
             if (lastMovement == null) {
                 return gameplay.getFirstPlayerColor();

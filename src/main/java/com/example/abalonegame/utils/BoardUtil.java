@@ -2,6 +2,7 @@ package com.example.abalonegame.utils;
 
 import com.example.abalonegame.db.entity.*;
 import com.example.abalonegame.enums.Color;
+import com.example.abalonegame.enums.Direction;
 import com.example.abalonegame.enums.GameStatus;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.InternalException;
@@ -11,7 +12,6 @@ import java.util.stream.Collectors;
 
 import static com.example.abalonegame.db.entity.Board.BOARD_SIZE;
 import static com.example.abalonegame.db.entity.Board.GAMING_BOARD_MIDDLE;
-import static com.example.abalonegame.db.entity.Field.DROP_FIELD;
 
 public abstract class BoardUtil {
     public static int BALLS_TO_LOSE = 8;
@@ -26,7 +26,7 @@ public abstract class BoardUtil {
                     break;
                 }
 
-                if (DROP_FIELD == y || y - x >= GAMING_BOARD_MIDDLE || DROP_FIELD == x) {
+                if (FieldUtil.isDropField(x, y)) {
                     int opX = GameUtil.calculateOppositeCord(x);
                     int opY = GameUtil.calculateOppositeCord(y);
                     gameBoard.add(new Field(null, board, x, y, true));
@@ -59,12 +59,12 @@ public abstract class BoardUtil {
         int yDirection = direction.getY();
 
         Field lastFieldInChain = FieldUtil.getLastFieldInChain(direction, movementFields);
-        Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(lastFieldInChain.getCordX() + xDirection, lastFieldInChain.getCordY() + yDirection, gameBoard);
+        Field fieldToMove = FieldUtil.findFieldOnBoardByCoords(lastFieldInChain.getX() + xDirection, lastFieldInChain.getY() + yDirection, gameBoard);
 
         if (fieldToMove.getColor() == null) {
             for (Field f : movementFields) {
                 Field tempField = FieldUtil.findSameFieldOnBoard(f, gameBoard);
-                fieldToMove = FieldUtil.findFieldOnBoardByCoords(f.getCordX() + xDirection, f.getCordY() + yDirection, gameBoard);
+                fieldToMove = FieldUtil.findFieldOnBoardByCoords(f.getX() + xDirection, f.getY() + yDirection, gameBoard);
                 if (!FieldUtil.transferBall(tempField, fieldToMove)) {
                     throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
                 }
@@ -76,7 +76,7 @@ public abstract class BoardUtil {
             xDirection *= -1;
             yDirection *= -1;
             for (int i = 0; i < BOARD_SIZE; i++) {
-                fieldToMove = FieldUtil.findFieldOnBoardByCoords(tempField.getCordX() + xDirection, tempField.getCordY() + yDirection, gameBoard);
+                fieldToMove = FieldUtil.findFieldOnBoardByCoords(tempField.getX() + xDirection, tempField.getY() + yDirection, gameBoard);
                 if (FieldUtil.getLastFieldInChain(direction, movementFields).equals(fieldToMove)) {
                     if (FieldUtil.transferBall(fieldToMove, tempField)) {
                         break;
@@ -120,18 +120,18 @@ public abstract class BoardUtil {
                 whiteBalls++;
             }
         }
-        if (blackBalls > BALLS_TO_LOSE && whiteBalls > BALLS_TO_LOSE){
+        if (blackBalls > BALLS_TO_LOSE && whiteBalls > BALLS_TO_LOSE) {
             return null;
         }
-        if(blackBalls <= BALLS_TO_LOSE){
-            if(firstPlayerColor.equals(Color.BLACK)){
+        if (blackBalls <= BALLS_TO_LOSE) {
+            if (firstPlayerColor.equals(Color.BLACK)) {
                 return GameStatus.SECOND_PLAYER_WON;
             } else {
                 return GameStatus.FIRST_PLAYER_WON;
             }
         }
-        if(whiteBalls <= BALLS_TO_LOSE){
-            if(firstPlayerColor.equals(Color.WHITE)){
+        if (whiteBalls <= BALLS_TO_LOSE) {
+            if (firstPlayerColor.equals(Color.WHITE)) {
                 return GameStatus.SECOND_PLAYER_WON;
             } else {
                 return GameStatus.FIRST_PLAYER_WON;

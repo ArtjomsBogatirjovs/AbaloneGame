@@ -1,10 +1,8 @@
 package com.example.abalonegame.db.entity;
 
 import com.example.abalonegame.enums.Color;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.example.abalonegame.enums.Direction;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -15,23 +13,24 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Movement {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id",nullable = false)
     private long id;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Direction direction;
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.ALL)
     private Set<Field> fields;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(nullable = false)
     private Board board;
     @ManyToOne
-    @JoinColumn(name = "player_id", nullable = false)
+    @JoinColumn(name = "player_id")
     private Player player;
-    @Column(name = "created", nullable = false)
+    @Column(name = "created",nullable = false)
     private Date created;
     @Column(name = "color", nullable = false)
     @Enumerated(EnumType.STRING)

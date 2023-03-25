@@ -1,9 +1,8 @@
 package com.example.abalonegame.utils;
 
-import com.example.abalonegame.db.entity.Direction;
 import com.example.abalonegame.db.entity.Field;
-import com.example.abalonegame.db.entity.Movement;
 import com.example.abalonegame.enums.Color;
+import com.example.abalonegame.enums.Direction;
 import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.InternalException;
 
@@ -12,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 import static com.example.abalonegame.db.entity.Board.BOARD_SIZE;
+import static com.example.abalonegame.db.entity.Board.GAMING_BOARD_MIDDLE;
+import static com.example.abalonegame.db.entity.Field.DROP_FIELD;
 
 public abstract class FieldUtil {
     public final static int MAX_NEAR_COORDINATE_DIFFERENCE = 1;
@@ -37,13 +38,13 @@ public abstract class FieldUtil {
             if (i + 1 < tempFields.size()) {
                 Field nextField = tempFields.get(i + 1);
                 if (xDiff != null && yDiff != null) {
-                    if (tempField.getCordX() - nextField.getCordX() != xDiff
-                            || tempField.getCordY() - nextField.getCordY() != yDiff) {
+                    if (tempField.getX() - nextField.getX() != xDiff
+                            || tempField.getY() - nextField.getY() != yDiff) {
                         return false;
                     }
                 } else {
-                    xDiff = tempField.getCordX() - nextField.getCordX();
-                    yDiff = tempField.getCordY() - nextField.getCordY();
+                    xDiff = tempField.getX() - nextField.getX();
+                    yDiff = tempField.getY() - nextField.getY();
                     if (xDiff > MAX_NEAR_COORDINATE_DIFFERENCE || xDiff < MIN_NEAR_COORDINATE_DIFFERENCE
                             || yDiff > MAX_NEAR_COORDINATE_DIFFERENCE || yDiff < MIN_NEAR_COORDINATE_DIFFERENCE) {
                         return false;
@@ -56,8 +57,8 @@ public abstract class FieldUtil {
 
     public static void sortFields(ArrayList<Field> fields) {
         fields.sort((f1, f2) -> {
-            int sum1 = f1.getCordX() + f1.getCordY();
-            int sum2 = f2.getCordX() + f2.getCordY();
+            int sum1 = f1.getX() + f1.getY();
+            int sum2 = f2.getX() + f2.getY();
             return Integer.compare(sum1, sum2);
         });
     }
@@ -79,8 +80,8 @@ public abstract class FieldUtil {
 
         if (fieldToFind != null) {
             return board.stream()
-                    .filter(field -> field.getCordX() == fieldToFind.getCordX())
-                    .filter(field -> field.getCordY() == fieldToFind.getCordY())
+                    .filter(field -> field.getX() == fieldToFind.getX())
+                    .filter(field -> field.getY() == fieldToFind.getY())
                     .filter(field -> field.getColor() == fieldToFind.getColor())
                     .findAny()
                     .orElse(null);
@@ -88,8 +89,8 @@ public abstract class FieldUtil {
 
         if (x != null && y != null) {
             return board.stream()
-                    .filter(field -> field.getCordX() == x)
-                    .filter(field -> field.getCordY() == y)
+                    .filter(field -> field.getX() == x)
+                    .filter(field -> field.getY() == y)
                     .findAny()
                     .orElse(null);
         }
@@ -104,7 +105,7 @@ public abstract class FieldUtil {
         int yDirection = direction.getY();
 
         for (int i = 0; i < BOARD_SIZE; i++) {
-            tempField = findFieldOnBoardByCoords(tempField.getCordX() + xDirection, tempField.getCordY() + yDirection, board);
+            tempField = findFieldOnBoardByCoords(tempField.getX() + xDirection, tempField.getY() + yDirection, board);
             if (tempField.getColor() == null) {
                 return tempField;
             }
@@ -120,19 +121,32 @@ public abstract class FieldUtil {
         int dirY = direction.getY() * -1;
 
         for (Field field : fields) {
-            if (FieldUtil.findFieldOnBoardByCoords(field.getCordX() + dirX, field.getCordY() + dirY, fields) == null) {
+            if (FieldUtil.findFieldOnBoardByCoords(field.getX() + dirX, field.getY() + dirY, fields) == null) {
                 return field;
             }
         }
         //theoretically this null not possible
         return null;
     }
-    public static boolean isColorMatchFieldsColor(Set<Field> fields, Color color){
-        for (Field field: fields) {
-            if(!color.equals(field.getColor())){
+
+    public static boolean isColorMatchFieldsColor(Set<Field> fields, Color color) {
+        for (Field field : fields) {
+            if (!color.equals(field.getColor())) {
                 return false;
             }
         }
         return true;
+    }
+
+    public static boolean isDropField(int x, int y) {
+        int opX = GameUtil.calculateOppositeCord(x);
+        int opY = GameUtil.calculateOppositeCord(y);
+        if (DROP_FIELD == y || y - x >= GAMING_BOARD_MIDDLE || DROP_FIELD == x) {
+            return true;
+        }
+        if (DROP_FIELD == opY || opY - opX >= GAMING_BOARD_MIDDLE || DROP_FIELD == opX) {
+            return true;
+        }
+        return false;
     }
 }

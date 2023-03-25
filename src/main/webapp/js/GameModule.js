@@ -83,10 +83,11 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         subscribe("/topic/movement/" + routeParams.id, initGameParams)
         canvas = document.getElementById("canvas");
         ctx = canvas.getContext("2d");
+        var gameType;
         initGameParams();
 
         function makePlayerMove() {
-            const parameters = {'fieldCords': selectedField, 'direction': direction}
+            const parameters = {'fieldCords': selectedField, 'x': direction.x, 'y': direction.y}
             http.get('/move/turn').then(function () {
                 http.post("/move/create", parameters, {
                     headers: {
@@ -94,9 +95,12 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
                     }
                 }).then(function (data) {
                     initGameParams(data.data);
-                    //getNextMove();
+                    if (gameType === "PvE") {
+                        getNextMove();
+                    }
                     stompClient.send('/topic/movement/' + routeParams.id, {}, "lol")
                 }).catch(function (data) {
+                    stompClient.send('/topic/movement/' + routeParams.id, {}, "lol")
                     raiseError(data.data.message);
                 });
             }).catch(function (data) {
@@ -105,25 +109,11 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         }
 
         function getNextMove() {
-            scope.nextMoveData = []
-            // COMPUTER IS A SECOND PLAYER
-            if (!scope.gameProperties.secondPlayer) {
-                http.get("/move/autocreate").then(function (data) {
-                    scope.nextMoveData = data;
-                    getMoveHistory().then(function () {
-                        var gameStatus = scope.movesInGame[scope.movesInGame.length - 1].status;
-                        if (gameStatus !== 'IN_PROGRESS') {
-                            alert(gameStatus)
-                        }
-                    });
-                }).catch(function () {
-                    scope.errorMessage = "Can't send the move"
-                });
+            http.get("/move/automove").then(function () {
+            }).catch(function () {
+                scope.errorMessage = "Can't send the move"
+            });
 
-                // SECOND PLAYER IS A REAL USER
-            } else {
-                console.log(' another player move');
-            }
         }
 
         scope.setDirection = function (dirX = 0, dirY = 0) {
@@ -135,23 +125,23 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         scope.getFieldsCords = function (fields) {
             let result = "";
             for (let field of fields) {
-                result += "(" + field.cordX + ", " + field.cordY + ") ";
+                result += "(" + field.x + ", " + field.y + ") ";
             }
             return result;
         }
 
-        scope.getDirectionArrow = function (x, y) {
-            if (x === -1 && y === -1) {
+        scope.getDirectionArrow = function (direction) {
+            if (direction === 'UP_LEFT') {
                 return "\u2196";
-            } else if (x === 1 && y === 1) {
+            } else if (direction === 'DOWN_RIGHT') {
                 return "\u2198";
-            } else if (x === 0 && y === -1) {
+            } else if (direction === 'DOWN_LEFT') {
                 return "\u2191";
-            } else if (x === 0 && y === 1) {
+            } else if (direction === 'UP_RIGHT') {
                 return "\u2193";
-            } else if (x === -1 && y === 0) {
+            } else if (direction === 'UP') {
                 return "\u2199";
-            } else if (x === 1 && y === 0) {
+            } else if (direction === 'DOWN') {
                 return "\u2197";
             }
         }
@@ -159,6 +149,13 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         function initGameParams(newGameStatus) {
             gameStatus = newGameStatus;
             http.get('/game/' + routeParams.id).then(function (data) {
+                gameType = data.data.type;
+                if (data.data.status === "SECOND_PLAYER_WON") {
+                    Swal.fire(data.data.playerTwo + "WON");
+                }
+                if (data.data.status === "FIRST_PLAYER_WON") {
+                    Swal.fire(data.data.playerOne + "WON");
+                }
                 initGameBoard(data.data.ballsCords);
             }).catch(function (data) {
                 raiseError(data.data.message);

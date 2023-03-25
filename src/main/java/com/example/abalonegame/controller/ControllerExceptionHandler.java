@@ -14,7 +14,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<MessageContainer> handleMissingServletRequestParameterException(HttpMessageNotReadableException ex) {
-        return new ResponseEntity<>(new MessageContainer( ExceptionMessage.GAME_TYPE_NULL.getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new MessageContainer(ExceptionMessage.GAME_TYPE_NULL.getMessage()), HttpStatus.BAD_REQUEST);
 
     }
 }

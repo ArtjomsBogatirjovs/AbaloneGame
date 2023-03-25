@@ -37,7 +37,7 @@ dependencies {
     implementation group: 'com.google.guava', name: 'guava', version: 'r05'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '2.7.8'
-
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 }
 
 tasks.named('test') {

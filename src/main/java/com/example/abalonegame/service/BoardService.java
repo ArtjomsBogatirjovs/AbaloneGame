@@ -21,10 +21,12 @@ public class BoardService { //TODO custom board create
         board.setGameplay(gameplay);
         return board;
     }
-    public void saveBoard(Board board){
+
+    public void saveBoard(Board board) {
         boardRepository.save(board);
     }
-    public Board getGameplayBoard(Gameplay gameplay){
+
+    public Board getGameplayBoard(Gameplay gameplay) {
         return boardRepository.findByGameplay(gameplay);
     }
 

@@ -22,19 +22,19 @@ public class FieldService {
         this.fieldRepository = fieldRepository;
     }
 
-    //FINISHED
+
     public void saveGameBoardFields(Set<Field> gameBoardFields) {
         fieldRepository.saveAll(gameBoardFields);
     }
 
-    //FINISHED
+
     public Field findFieldFromMap(Map<Coordinates, FieldCoordinates> map, Board board) {
         int x = map.get(Coordinates.X).getValue();
         int y = map.get(Coordinates.Y).getValue();
-        return fieldRepository.findByCordXAndCordYAndBoard(x, y, board);
+        return fieldRepository.findByXAndYAndBoard(x, y, board);
     }
 
-    //FINISHED
+
     public ArrayList<Field> findFieldByCords(ArrayList<String> cords, Board board) {
         ArrayList<Field> result = new ArrayList<>();
         ArrayList<Map<Coordinates, FieldCoordinates>> tempFieldCords = GameUtil.resolveCoordinateList(cords);

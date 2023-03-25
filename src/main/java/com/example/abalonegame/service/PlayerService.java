@@ -37,6 +37,7 @@ public class PlayerService {
         ContextUser principal = (ContextUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return playerRepository.findOneByName(principal.getPlayer().getName());
     }
+
     public List<Player> listPlayers() {
         return (List<Player>) playerRepository.findAll();
     }

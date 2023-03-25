@@ -12,7 +12,7 @@ import java.util.*;
 
 public abstract class GameUtil {
     public static boolean isPlayerTurn(Gameplay currentGameplay, Player currentPlayer, Movement lastMovement) {
-        if(currentGameplay.getGameType().equals(GameType.LOCAL)){
+        if (currentGameplay.getGameType().equals(GameType.LOCAL)) {
             return true;
         }
         if (lastMovement == null) {
@@ -81,14 +81,14 @@ public abstract class GameUtil {
     }
 
     public static boolean isDirectionLikeRow(Set<Field> fields, Direction direction) {
-        if (fields.size() < MovementUtil.MIN_BALLS_TO_SUMITO) { //TODO move constant
+        if (fields.size() < MovementUtil.MIN_BALLS_TO_SUMITO) {
             return true;
         }
         int xDir = direction.getX();
         int yDir = direction.getY();
         for (Field field : fields) {
-            if (FieldUtil.findFieldOnBoardByCoords(field.getCordX() + xDir, field.getCordY() + yDir, fields) == null
-                    && FieldUtil.findFieldOnBoardByCoords(field.getCordX() - xDir, field.getCordY() - yDir, fields) == null) {
+            if (FieldUtil.findFieldOnBoardByCoords(field.getX() + xDir, field.getY() + yDir, fields) == null
+                    && FieldUtil.findFieldOnBoardByCoords(field.getX() - xDir, field.getY() - yDir, fields) == null) {
                 return false;
             }
         }
@@ -96,7 +96,7 @@ public abstract class GameUtil {
     }
 
     public static Color getPlayerColor(Gameplay gameplay, Player player) {
-        if (player.equals(gameplay.getPlayerOne())) {
+        if (gameplay.getPlayerOne().equals(player)) {
             return gameplay.getFirstPlayerColor();
         } else {
             return gameplay.getSecondPlayerColor();
@@ -105,8 +105,8 @@ public abstract class GameUtil {
 
     public static String fieldCordToString(Field field) {
         String result = "";
-        int x = field.getCordX();
-        int y = field.getCordY();
+        int x = field.getX();
+        int y = field.getY();
         for (FieldCoordinates fc : FieldCoordinates.values()) {
             if (fc.getValue().equals(x)) {
                 result += fc.getStringValue().toLowerCase();
@@ -115,8 +115,16 @@ public abstract class GameUtil {
         }
         return result + y;
     }
-    public static boolean isFinished(Gameplay gameplay){
+
+    public static boolean isFinished(Gameplay gameplay) {
         return !gameplay.getStatus().equals(GameStatus.WAITS_FOR_PLAYER) && !gameplay.getStatus().equals(GameStatus.IN_PROGRESS);
+    }
+
+    public static Direction getDirection(int x, int y) {
+        return Arrays.stream(Direction.values())
+                .filter(directions -> directions.getX() == x && directions.getY() == y)
+                .findAny()
+                .get();
     }
 }
 

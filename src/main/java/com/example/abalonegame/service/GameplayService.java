@@ -51,6 +51,9 @@ public class GameplayService {
         gameDTO.setStatus(gameplay.getStatus());
         gameDTO.setBallsCords(BoardUtil.convertGameBoardToResponse(gameBoard));
         gameDTO.setGameId(gameplay.getId());
+        gameDTO.setPlayerOne(gameplay.getPlayerOne());
+        gameDTO.setPlayerTwo(gameplay.getPlayerTwo());
+        gameDTO.setType(gameplay.getGameType());
         return gameDTO;
     }
 
