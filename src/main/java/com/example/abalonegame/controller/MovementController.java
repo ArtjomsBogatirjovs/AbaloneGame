@@ -1,5 +1,6 @@
 package com.example.abalonegame.controller;
 
+import com.example.abalonegame.bot.db.entity.BotMovement;
 import com.example.abalonegame.bot.db.entity.GameState;
 import com.example.abalonegame.bot.db.entity.SimpleField;
 import com.example.abalonegame.bot.service.BotMovementService;
@@ -12,6 +13,7 @@ import com.example.abalonegame.enums.Direction;
 import com.example.abalonegame.enums.GameStatus;
 import com.example.abalonegame.service.*;
 import com.example.abalonegame.utils.BoardUtil;
+import com.example.abalonegame.utils.FieldUtil;
 import com.example.abalonegame.utils.GameUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -98,10 +100,59 @@ public class MovementController {
         Board currentBoard = boardService.getGameplayBoard(currentGame);
 
         Set<Field> gameBoardFields = fieldService.getGameBoardFields(currentBoard);
-        ArrayList<SimpleField> stateFields = simpleFieldService.getOrCreateSimpleFields(gameBoardFields);
+        ArrayList<SimpleField> stateFields = simpleFieldService.getOrCreateSimpleFields(gameBoardFields);//TODO turn on database
 
-        GameState gameState = gameStateService.getOrCreateGameState(stateFields);
-        botMovementService.calculateMove(gameState,currentGame.getSecondPlayerColor());
+        GameState gameState = gameStateService.getOrCreateGameState(stateFields);//TODO turn on database
+        BotMovement botMovement = botMovementService.calculateMove(gameState, currentGame.getSecondPlayerColor(), currentBoard);
+        Set<Field> movementFields = FieldUtil.findFieldsOnBoardByCords(gameBoardFields, botMovement.getFields());
+        Movement move = movementService.createMove(
+                currentBoard,
+                null,
+                currentGame,
+                botMovement.getDirection(),
+                movementFields);
+        gameplayService.validate(currentGame);
+        movementService.validateAndSave(move, gameBoardFields);
+
+        BoardUtil.makeMove(gameBoardFields, move);
+        fieldService.saveGameBoardFields(gameBoardFields);
+
+        GameStatus tempStatus = BoardUtil.checkIfPlayerWin(gameBoardFields, currentGame);
+        gameplayService.updateGameStatus(currentGame, tempStatus);
+
+        return true;
+    }
+
+    @RequestMapping(value = "/autoplay", method = RequestMethod.GET)
+    public boolean autoplay() {
+        Long gameId = (Long) httpSession.getAttribute(BoardUtil.GAME_ID_ATTRIBUTE);
+        Gameplay currentGame = gameplayService.getGameplay(gameId);
+        Board currentBoard = boardService.getGameplayBoard(currentGame);
+
+        while (currentGame.getStatus().equals(GameStatus.IN_PROGRESS)) {
+            Set<Field> gameBoardFields = fieldService.getGameBoardFields(currentBoard);
+            ArrayList<SimpleField> stateFields = simpleFieldService.getOrCreateSimpleFields(gameBoardFields);
+
+            GameState gameState = gameStateService.getOrCreateGameState(stateFields);
+            BotMovement botMovement = botMovementService.calculateMove(gameState, currentGame.getSecondPlayerColor(), currentBoard);
+
+            Set<Field> movementFields = FieldUtil.findFieldsOnBoardByCords(gameBoardFields, botMovement.getFields());
+            Movement move = movementService.createMove(
+                    currentBoard,
+                    null,
+                    currentGame,
+                    botMovement.getDirection(),
+                    movementFields);
+            gameplayService.validate(currentGame);
+            movementService.validateAndSave(move, gameBoardFields);
+
+            BoardUtil.makeMove(gameBoardFields, move);
+            fieldService.saveGameBoardFields(gameBoardFields);
+
+            GameStatus tempStatus = BoardUtil.checkIfPlayerWin(gameBoardFields, currentGame);
+            gameplayService.updateGameStatus(currentGame, tempStatus);
+        }
+
         return true;
     }
 }

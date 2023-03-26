@@ -1,3 +1,7 @@
+<!--
+  ~ Author Artjoms Bogatirjovs 26.3.2023
+  -->
+
 <div class="container">
     <div class="row">
         <!-- FORM for creating new game -->
@@ -18,7 +22,7 @@
                 <div class="form-group">
                     <label for="piece" class="col-md-2 control-label">Play as:</label>
                     <div class="col-md-8">
-                        <select required class="form-control" name="color" id="piece"
+                        <select required class="form-control" id="piece"
                                 ng-model="newGameData.color">
                             <option ng-repeat="option in newGameOptions.availableColors" value="{{option.name}}">
                                 {{option.name}}

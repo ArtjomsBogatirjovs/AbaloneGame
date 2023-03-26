@@ -1,8 +1,7 @@
 package com.example.abalonegame.db.entity;
 
 /*
-    Class storage for gameplay
-    Author:Artjoms Bogatirjovs
+    Author: Artjoms Bogatirjovs
  */
 
 import com.example.abalonegame.enums.Color;

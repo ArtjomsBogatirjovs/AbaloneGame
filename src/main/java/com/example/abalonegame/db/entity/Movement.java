@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Movement {
+public class Movement implements Cloneable{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id",nullable = false)
@@ -25,15 +25,25 @@ public class Movement {
     @ManyToMany(cascade = CascadeType.ALL)
     private Set<Field> fields;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(nullable = false)
-    private Board board;
+    @JoinColumn
+    private Board board;//TODO make not null
     @ManyToOne
     @JoinColumn(name = "player_id")
     private Player player;
-    @Column(name = "created",nullable = false)
+    @Column(name = "created")
     private Date created;
     @Column(name = "color", nullable = false)
     @Enumerated(EnumType.STRING)
     private Color movementColor;
 
+    @Override
+    public Movement clone() {
+        try {
+            Movement clone = (Movement) super.clone();
+            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

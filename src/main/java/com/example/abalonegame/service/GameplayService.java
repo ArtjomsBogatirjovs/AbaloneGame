@@ -46,7 +46,7 @@ public class GameplayService {
         return gameplay;
     }
 
-    public GameDTO createGameDTO(Gameplay gameplay, Set<Field> gameBoard) {
+    public GameDTO createGameDTO(Gameplay gameplay, Set<Field> gameBoard,Color color) {
         GameDTO gameDTO = new GameDTO();
         gameDTO.setStatus(gameplay.getStatus());
         gameDTO.setBallsCords(BoardUtil.convertGameBoardToResponse(gameBoard));
@@ -54,10 +54,11 @@ public class GameplayService {
         gameDTO.setPlayerOne(gameplay.getPlayerOne());
         gameDTO.setPlayerTwo(gameplay.getPlayerTwo());
         gameDTO.setType(gameplay.getGameType());
+        gameDTO.setPlayerColor(color);
         return gameDTO;
     }
 
-    public Gameplay connectGame(Player player, CreateGameDTO createGameDTO) {
+    public Gameplay connectGame(Player player, CreateGameDTO createGameDTO) throws NotFoundException {
         Gameplay gameplay = getGameplay(createGameDTO.getId());
         gameplay.setPlayerTwo(player);
         gameplay.setStatus(GameStatus.IN_PROGRESS);
@@ -81,7 +82,7 @@ public class GameplayService {
                 .collect(Collectors.toList());
     }
 
-    public Gameplay getGameplay(Long id) {
+    public Gameplay getGameplay(Long id) throws NotFoundException {
         if (gameplayRepository.findById(id).isEmpty()) {
             throw new NotFoundException(ExceptionMessage.NOT_FOUND);
         }

@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 
 @Setter
 @Getter
@@ -21,8 +20,4 @@ public class BotMovement extends Movement {
     private int score = 0;
     @ManyToOne(cascade = CascadeType.ALL)
     private GameState gameState;
-    @Transient
-    private ArrayList<SimpleField> simpleFields;
-
-
 }

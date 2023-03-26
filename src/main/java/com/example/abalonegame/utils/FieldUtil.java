@@ -7,6 +7,7 @@ import com.example.abalonegame.exception.ExceptionMessage;
 import com.example.abalonegame.exception.InternalException;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -148,5 +149,21 @@ public abstract class FieldUtil {
             return true;
         }
         return false;
+    }
+
+    public static Set<Field> cloneFields(Set<Field> original) {
+        Set<Field> copy = new HashSet<>();
+        for (Field item : original) {
+            copy.add(item.clone());
+        }
+        return copy;
+    }
+
+    public static Set<Field> findFieldsOnBoardByCords(Set<Field> gameBoard, Set<Field> fieldToFind) {
+        Set<Field> result = new HashSet<>();
+        for (Field f : fieldToFind) {
+            result.add(findFieldOnBoardByCoords(f.getX(), f.getY(), gameBoard));
+        }
+        return result;
     }
 }

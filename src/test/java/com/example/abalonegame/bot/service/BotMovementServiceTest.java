@@ -30,13 +30,13 @@ class BotMovementServiceTest {
     @Test
     void findMovementsWithOneBall() {
         initGameBoard_full();
-        assertEquals(44, botMovementService.findPossibleMovements(Color.WHITE, testGameBoard, 3).size());
-        assertEquals(44, botMovementService.findPossibleMovements(Color.BLACK, testGameBoard, 3).size());
+        assertEquals(44, botMovementService.findPossibleMovements(Color.WHITE, testGameBoard, null).size());
+        assertEquals(44, botMovementService.findPossibleMovements(Color.BLACK, testGameBoard, null).size());
     }
     @Test
     void findMovementsWithThreeBalls() {
         initBoard_1();
-        assertEquals(3, botMovementService.findPossibleMovements(Color.BLACK, testGameBoard, 1).size());
+        assertEquals(3, botMovementService.findPossibleMovements(Color.BLACK, testGameBoard, null).size());
     }
 
     private void initBoard_1() {

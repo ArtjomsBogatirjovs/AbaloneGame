@@ -1,9 +1,11 @@
-package com.example.abalonegame.db.entity;
+/*
+ * Author Artjoms Bogatirjovs 25.3.2023
+ */
 
+package com.example.abalonegame.db.entity;
 
 import com.example.abalonegame.enums.Color;
 import lombok.*;
-
 
 import javax.persistence.*;
 
@@ -13,7 +15,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Setter
-public class Field {
+public class Field implements Cloneable{
     public final static int DROP_FIELD = 0;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -37,5 +39,16 @@ public class Field {
         this.y = y;
         this.board = board;
         this.isDropField = isDropField;
+    }
+
+    @Override
+    public Field clone() {
+        try {
+            Field clone = (Field) super.clone();
+            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

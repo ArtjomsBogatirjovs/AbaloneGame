@@ -23,4 +23,5 @@ public class GameDTO {
     private Player playerOne;
     private Player playerTwo;
     private GameType type;
+    private Color playerColor;
 }

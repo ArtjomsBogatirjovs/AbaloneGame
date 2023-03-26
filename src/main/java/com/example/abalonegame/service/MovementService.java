@@ -34,11 +34,12 @@ public class MovementService {
         move.setDirection(direction);
         move.setFields(fields);
         move.setMovementColor(color);
-        if (gameplay != null && player != null && board != null) {
+        if (board != null && gameplay != null) {
             move.setCreated(new Date());
-            move.setBoard(board);
-            move.setPlayer(player);
         }
+        move.setBoard(board);
+        move.setPlayer(player);
+
         return move;
     }
 
@@ -46,7 +47,6 @@ public class MovementService {
         return createMove(null, null, null, direction, fields);
     }
 
-    //FINISHED NEED TO TEST
     public List<CreateMoveDTO> getMovesInGame(Board board) {
         List<Movement> movesInGame = movementRepository.findByBoardOrderByCreatedDesc(board);
         List<CreateMoveDTO> moves = new ArrayList<>();
@@ -56,7 +56,9 @@ public class MovementService {
             createMoveDTO.setDirection(movement.getDirection());
             createMoveDTO.setFields(movement.getFields());
             createMoveDTO.setCreated(movement.getCreated());
-            createMoveDTO.setPlayerName(movement.getPlayer().getName());
+            if (movement.getPlayer() != null) {
+                createMoveDTO.setPlayerName(movement.getPlayer().getName());
+            }
             createMoveDTO.setPlayerColor(movement.getMovementColor());
             moves.add(createMoveDTO);
         }
@@ -72,7 +74,8 @@ public class MovementService {
     }
 
     public void validateAndSave(Movement move, Set<Field> gameBoard) {
-        validate(move, gameBoard);
+        Movement lastMove = getLastMovement(move.getBoard());
+        validate(move, gameBoard, lastMove);
         saveMovement(move);
     }
 
@@ -80,8 +83,8 @@ public class MovementService {
         movementRepository.save(move);
     }
 
-    public void validate(Movement movement, Set<Field> gameBoard) {
-        validate(movement);
+    public void validate(Movement movement, Set<Field> gameBoard, Movement lastMove) {
+        validate(movement, lastMove);
         if (MovementUtil.isMoveToDropField(movement, gameBoard)) {
             throw new IllegalMovementException(ExceptionMessage.MOVE_TO_DROP_FIELD);
         }
@@ -96,16 +99,15 @@ public class MovementService {
         }
     }
 
-    public void validate(Movement movement) {
+    public void validate(Movement movement, Movement lastMove) {
         Set<Field> movementFields = movement.getFields();
-        Movement lastMove = getLastMovement(movement.getBoard());
         if (MovementUtil.isMovementsSameColor(movement, lastMove)) {
             throw new ValidateException(ExceptionMessage.NOT_YOUR_TURN);
         }
         if (MovementUtil.isMovementWithoutBalls(movement)) {
             throw new IllegalMovementException(ExceptionMessage.FIELD_WO_BALL);
         }
-        if (movementFields == null || movementFields.isEmpty() || movementFields.size() > MovementUtil.MAX_MOVEMENT_FIELD_AMOUNT) {
+        if (movementFields == null || movementFields.isEmpty() || movementFields.size() > MovementUtil.MAX_BALLS_IN_LINES) {
             throw new IllegalMovementException(ExceptionMessage.WRONG_AMOUNT);
         }
         if (!FieldUtil.isColorMatchFieldsColor(movement.getFields(), movement.getMovementColor())) {

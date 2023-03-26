@@ -38,7 +38,13 @@ function subscribeToTopic(topic, callback) {
     })
 }
 
-function showInfo(event) {
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function showInfo(event) {
+    board.drawGameState();
+    await sleep(8);
     var fields = parseCoordinates(event.target.innerText);
     for (const field of fields) {
         var x = fieldEnum[field.x];
@@ -80,4 +86,12 @@ function parseCoordinates(str) {
         coordinates.push({x, y});
     }
     return coordinates;
+}
+
+function calculateOpColor(color) {
+    if (color === 'BLACK') {
+        return 'WHITE';
+    } else {
+        return 'BLACK';
+    }
 }

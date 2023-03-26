@@ -13,12 +13,12 @@ import java.util.Set;
 import static com.example.abalonegame.db.entity.Board.BOARD_SIZE;
 
 public abstract class MovementUtil {
-    public final static int MAX_MOVEMENT_FIELD_AMOUNT = 3;
-    public final static int MIN_BALLS_TO_SUMITO = 2;
+    public final static int MAX_BALLS_IN_LINES = 3;
+    public final static int MIN_BALLS_IN_LINE = 2;
 
     public static boolean isSumito(Movement move, Set<Field> gameBoard) {
         Set<Field> fields = move.getFields();
-        if (fields.size() < MIN_BALLS_TO_SUMITO) {
+        if (fields.size() < MIN_BALLS_IN_LINE) {
             return false;
         }
         if (!GameUtil.isDirectionLikeRow(move.getFields(), move.getDirection())) {

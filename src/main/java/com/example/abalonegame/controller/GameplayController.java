@@ -6,13 +6,13 @@ import com.example.abalonegame.db.entity.Gameplay;
 import com.example.abalonegame.db.entity.Player;
 import com.example.abalonegame.dto.CreateGameDTO;
 import com.example.abalonegame.dto.GameDTO;
-import com.example.abalonegame.exception.InvalidGameException;
 import com.example.abalonegame.exception.NotFoundException;
 import com.example.abalonegame.service.BoardService;
 import com.example.abalonegame.service.FieldService;
 import com.example.abalonegame.service.GameplayService;
 import com.example.abalonegame.service.PlayerService;
 import com.example.abalonegame.utils.BoardUtil;
+import com.example.abalonegame.utils.GameUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -51,7 +51,7 @@ public class GameplayController {
         fieldService.saveGameBoardFields(gameBoardFields);
 
         httpSession.setAttribute("gameId", createGameDTO.getId());
-        return gameplayService.createGameDTO(gameplay, gameBoardFields);
+        return gameplayService.createGameDTO(gameplay, gameBoardFields, GameUtil.getPlayerColor(gameplay, tempPlayer));
     }
 
     @RequestMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -65,16 +65,17 @@ public class GameplayController {
     }
 
     @PostMapping("/connect")
-    public Gameplay connect(@RequestBody CreateGameDTO createGameDTO) throws NotFoundException, InvalidGameException {
+    public Gameplay connect(@RequestBody CreateGameDTO createGameDTO) throws NotFoundException {
         return gameplayService.connectGame(playerService.getLoggedUser(), createGameDTO);
     }
 
     @RequestMapping(value = "/{id}")
     public GameDTO getGameProperties(@PathVariable Long id) {
+        Player tempPlayer = playerService.getLoggedUser();
         httpSession.setAttribute("gameId", id);
         Gameplay gameplay = gameplayService.getGameplay(id);
         Board gameBoard = boardService.getGameplayBoard(gameplay);
         Set<Field> gameBoardFields = fieldService.getGameBoardFields(gameBoard);
-        return gameplayService.createGameDTO(gameplay, gameBoardFields);
+        return gameplayService.createGameDTO(gameplay, gameBoardFields, GameUtil.getPlayerColor(gameplay, tempPlayer));
     }
 }

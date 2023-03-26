@@ -1,9 +1,10 @@
+/*
+ * Author Artjoms Bogatirjovs 25.3.2023
+ */
+
 package com.example.abalonegame.bot.util;
 
-import com.example.abalonegame.bot.db.repository.BotMovementRepository;
-import com.example.abalonegame.bot.service.BotMovementService;
 import com.example.abalonegame.db.entity.Field;
-import com.example.abalonegame.db.repository.MovementRepository;
 import com.example.abalonegame.enums.Color;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
+
 
 class BotUtilTest {
     private Set<Field> testGameBoard;
@@ -37,26 +38,53 @@ class BotUtilTest {
 
     @Test
     void calculateScoreByBallsInCenterFullBoard() {
-        initGameBoard_full();
+        initBoard_full();
         int expected = 24;
-        int actual = BotUtil.calculateScoreByBallsInCenter(testGameBoard,Color.WHITE);
-        assertEquals(expected,actual);
+        int actual = BotUtil.calculateScoreByBallsInCenter(testGameBoard, Color.WHITE);
+        assertEquals(expected, actual);
     }
+
     @Test
     void calculateScoreByBallsInCenterMiddleBoard() {
         initBoard_1();
         int expected = 9;
-        int actual = BotUtil.calculateScoreByBallsInCenter(testGameBoard,Color.BLACK);
-        assertEquals(expected,actual);
+        int actual = BotUtil.calculateScoreByBallsInCenter(testGameBoard, Color.BLACK);
+        assertEquals(expected, actual);
     }
+
     @Test
     void calculateScoreByBallsInCenterMiddleBoardFull() {
         initBoard_2();
         int expected = 29;
-        int actual = BotUtil.calculateScoreByBallsInCenter(testGameBoard,Color.WHITE);
-        assertEquals(expected,actual);
+        int actual = BotUtil.calculateScoreByBallsInCenter(testGameBoard, Color.WHITE);
+        assertEquals(expected, actual);
     }
-    private void initGameBoard_full() {
+
+    @Test
+    void findAllLinesFullBoard() {
+        initBoard_full();
+        int expected = 41;
+        int actual = BotUtil.findAllLines(Color.WHITE, testGameBoard, 3).size();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void findAllLinesCenterBallsBoard() {
+        initBoard_2();
+        int expected = 15;
+        int actual = BotUtil.findAllLines(Color.WHITE, testGameBoard, 3).size();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void calculateScoreByLines() {
+        initBoard_2();
+        int expected = 18;
+        int actual = BotUtil.calculateScoreByLines(testGameBoard, Color.WHITE);
+        assertEquals(expected, actual);
+    }
+
+    private void initBoard_full() {
         testGameBoard.add(new Field(null, null, 0, 0, true));
         testGameBoard.add(new Field(null, null, 1, 0, true));
         testGameBoard.add(new Field(null, null, 2, 0, true));
@@ -197,6 +225,7 @@ class BotUtilTest {
         testGameBoard.add(new Field(null, null, 9, 10, true));
         testGameBoard.add(new Field(null, null, 10, 10, true));
     }
+
     private void initBoard_1() {
         testGameBoard.add(new Field(null, null, 4, 4, false));
         testGameBoard.add(new Field(Color.WHITE, null, 4, 5, false));
@@ -206,6 +235,7 @@ class BotUtilTest {
         testGameBoard.add(new Field(null, null, 5, 4, false));
         testGameBoard.add(new Field(Color.BLACK, null, 5, 5, false));
     }
+
     private void initBoard_2() {
         testGameBoard.add(new Field(Color.WHITE, null, 4, 4, false));
         testGameBoard.add(new Field(Color.WHITE, null, 4, 5, false));

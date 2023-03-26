@@ -80,10 +80,10 @@ gameModule.controller('playerGamesController', ['$scope', '$http', '$location', 
 
 gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope', '$http',
     function (rootScope, routeParams, scope, http) {
-        subscribe("/topic/movement/" + routeParams.id, initGameParams)
+        var gameType;
         canvas = document.getElementById("canvas");
         ctx = canvas.getContext("2d");
-        var gameType;
+        subscribe("/topic/movement/" + routeParams.id, initGameParams)
         initGameParams();
 
         function makePlayerMove() {
@@ -110,6 +110,7 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
 
         function getNextMove() {
             http.get("/move/automove").then(function () {
+                stompClient.send('/topic/movement/' + routeParams.id, {}, "lol")
             }).catch(function () {
                 scope.errorMessage = "Can't send the move"
             });
@@ -149,6 +150,8 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         function initGameParams(newGameStatus) {
             gameStatus = newGameStatus;
             http.get('/game/' + routeParams.id).then(function (data) {
+                color = data.data.playerColor;
+                opColor = calculateOpColor(color);
                 gameType = data.data.type;
                 if (data.data.status === "SECOND_PLAYER_WON") {
                     Swal.fire(data.data.playerTwo + "WON");
@@ -165,6 +168,8 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         function initGameBoard(newGameState) {
             selectedField = [];
             gameState = newGameState;
+            scope.ballToLose = gameState[color].length - 8;
+            scope.ballToWin = gameState[opColor].length - 8;
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             board.drawBoard();
             board.drawGameState();

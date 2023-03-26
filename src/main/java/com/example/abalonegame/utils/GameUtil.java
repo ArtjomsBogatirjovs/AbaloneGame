@@ -21,10 +21,10 @@ public abstract class GameUtil {
             } else {
                 throw new ValidateException(ExceptionMessage.NOT_YOUR_TURN);
             }
-        } else if (lastMovement.getPlayer().equals(currentPlayer)) {
+        } else if (currentPlayer.equals(lastMovement.getPlayer())) {
             throw new ValidateException(ExceptionMessage.NOT_YOUR_TURN);
         }
-        return !lastMovement.getPlayer().equals(currentPlayer);
+        return !currentPlayer.equals(lastMovement.getPlayer());
     }
 
     public static final int COORDINATE_VALUE_LENGTH = 2;
@@ -81,7 +81,7 @@ public abstract class GameUtil {
     }
 
     public static boolean isDirectionLikeRow(Set<Field> fields, Direction direction) {
-        if (fields.size() < MovementUtil.MIN_BALLS_TO_SUMITO) {
+        if (fields.size() < MovementUtil.MIN_BALLS_IN_LINE) {
             return true;
         }
         int xDir = direction.getX();

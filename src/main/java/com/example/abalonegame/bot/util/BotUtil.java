@@ -1,3 +1,7 @@
+/*
+ * Author Artjoms Bogatirjovs 25.3.2023
+ */
+
 package com.example.abalonegame.bot.util;
 
 
@@ -5,9 +9,16 @@ import com.example.abalonegame.bot.db.entity.BotMovement;
 import com.example.abalonegame.bot.db.entity.SimpleField;
 import com.example.abalonegame.db.entity.Board;
 import com.example.abalonegame.db.entity.Field;
+import com.example.abalonegame.db.entity.Movement;
 import com.example.abalonegame.enums.Color;
 import com.example.abalonegame.enums.Direction;
+import com.example.abalonegame.exception.ExceptionMessage;
+import com.example.abalonegame.exception.InternalException;
+import com.example.abalonegame.exception.ValidateException;
+import com.example.abalonegame.utils.BoardUtil;
 import com.example.abalonegame.utils.FieldUtil;
+import com.example.abalonegame.utils.MovementUtil;
+import com.google.common.collect.Sets;
 
 
 import java.util.HashSet;
@@ -41,7 +52,7 @@ public abstract class BotUtil {
         return tempField;
     }
 
-    public static int calculateScoreByBallsInCenter(Set<Field> gameBoard, Color color) {
+    public static int calculateScoreByBallsInCenter(Set<Field> gameBoard, Color color) {//TODO Refactor findBallsByLevel fromLevel- toLevel
         int result = BotMovement.DEFAULT_SCORE;
         Field centerField = FieldUtil.findFieldOnBoardByCoords(Board.GAMING_BOARD_MIDDLE, Board.GAMING_BOARD_MIDDLE, gameBoard);
         Direction[] directions = Direction.values();
@@ -74,5 +85,70 @@ public abstract class BotUtil {
             }
         }
         return result;
+    }
+
+
+    public static Set<Set<Field>> findAllLines(Color color, Set<Field> gameBoard, int maxBallsInRow) {
+        Set<Set<Field>> lines = new HashSet<>();
+        Set<Field> fieldsWithColor = BotUtil.findFieldsByColor(gameBoard, color);
+        for (Field f : fieldsWithColor) {
+            if (f.getColor() == null) {
+                throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
+            }
+            for (int i = MovementUtil.MIN_BALLS_IN_LINE; i <= maxBallsInRow; i++) {
+                for (Direction fieldsDir : Direction.values()) {
+                    Set<Field> fieldsToMove = new HashSet<>(Set.of(f));
+                    try {
+                        tryCreateLineInDirection(gameBoard, f, i, fieldsDir, fieldsToMove);
+                        lines.add(fieldsToMove);
+                    } catch (ValidateException ignored) {
+                    }
+                }
+            }
+        }
+        return lines;
+    }
+
+    public static long countLinesNumber(Set<Set<Field>> lines, int lineSize) {
+        return lines.stream()
+                .filter(line -> line.size() == lineSize)
+                .count();
+    }
+
+    public static int calculateScoreByLines(Set<Field> gameBoard, Color color) {
+        int result = 0;
+        Set<Set<Field>> lines = findAllLines(color, gameBoard,MovementUtil.MAX_BALLS_IN_LINES);
+        long threeBallsInLine = countLinesNumber(lines, MovementUtil.MAX_BALLS_IN_LINES);
+        long twoBallsInLine = countLinesNumber(lines, MovementUtil.MIN_BALLS_IN_LINE);
+        result += threeBallsInLine; //TODO changed only for three balls and removed *3
+        return result;
+    }
+    public static Set<Field> calculatePushableBallsOnEdge(Set<Field> gameBoard, Color myColor, Set<Movement> opponentMovements){
+        Set<Field> result = new HashSet<>();
+        Set<Field> fieldsWithColor = BotUtil.findFieldsByColor(gameBoard, myColor);
+        for(Movement opMove : opponentMovements){
+            Set<Field> copyOfBoard = FieldUtil.cloneFields(gameBoard);
+            BoardUtil.makeMove(copyOfBoard, opMove);
+            if(fieldsWithColor.size() != BotUtil.findFieldsByColor(copyOfBoard, myColor).size()){
+                Set<Field> fieldsWithColorAfterMove = BotUtil.findFieldsByColor(copyOfBoard, myColor);
+                Set<Field> diff = Sets.difference(fieldsWithColor,fieldsWithColorAfterMove);
+                result.addAll(diff);
+            }
+        }
+        return result;
+    }
+
+    //use only in try-catch block
+    public static void tryCreateLineInDirection(Set<Field> gameBoard, Field f, int ballInLine, Direction fieldsDir, Set<Field> fieldsToMove) {
+        for (int j = 1; j < ballInLine; j++) {
+            Field movementField = FieldUtil.findFieldOnBoardByCoords(f.getX() + fieldsDir.getX() * j, f.getY() + fieldsDir.getY() * j, gameBoard);
+            if (movementField == null) {
+                throw new ValidateException();
+            }
+            if (!f.getColor().equals(movementField.getColor())) {
+                throw new ValidateException();
+            }
+            fieldsToMove.add(movementField);
+        }
     }
 }

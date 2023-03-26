@@ -23,12 +23,16 @@ button:hover {
     background-color: #3e8e41;
 }
 
-#up {
-    text-align: center;
+#buttons {
+    position: relative;
+    left: 400px;
+    height: 100px;
+    width: 300px;
 }
 
 #down {
     transform: rotate(180deg);
+
 }
 
 #up-left {
@@ -46,3 +50,70 @@ button:hover {
 #down-right {
     transform: rotate(135deg);
 }
+
+@keyframes colorGreen {
+    0% {
+        background: #33CCCC;
+    }
+    20% {
+        background: #33CC36;
+    }
+    40% {
+        background: #B8CC33;
+    }
+    60% {
+        background: #FCCA00;
+    }
+    80% {
+        background: #33CC36;
+    }
+    100% {
+        background: #33CCCC;
+    }
+}
+
+@keyframes colorRed {
+    0% {
+        background: #33CCCC;
+    }
+    20% {
+        background: #d51174;
+    }
+    40% {
+        background: #ce1121;
+    }
+    60% {
+        background: #ff0000;
+    }
+    80% {
+        background: #941248;
+    }
+    100% {
+        background: #33CCCC;
+    }
+}
+
+#winBall {
+    position: relative;
+    left: 100px;
+    top: 100px;
+    color: #000000;
+    font-size: 36px;
+    background: #33CCCC; /* Fallback */
+    animation: colorGreen 9s infinite linear;
+    text-align: center;
+    padding: 1em;
+}
+
+#loseBall {
+    position: relative;
+    right: 100px;
+    top: 100px;
+    color: #000000;
+    font-size: 36px;
+    background: #33CCCC; /* Fallback */
+    animation: colorRed 9s infinite linear;
+    text-align: center;
+    padding: 1em;
+}
+
