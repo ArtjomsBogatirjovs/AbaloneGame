@@ -94,11 +94,11 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
                 }).then(function (data) {
                     initGameParams(data.data);
                     if (gameType === "PvE") {
-                        getNextMove();
+                        getNextMove(botType);
                     }
-                    stompClient.send('/topic/movement/' + routeParams.id, {}, "lol")
+                    stompClient.send('/topic/movement/' + routeParams.id, {}, "Field update")
                 }).catch(function (data) {
-                    stompClient.send('/topic/movement/' + routeParams.id, {}, "lol")
+                    stompClient.send('/topic/movement/' + routeParams.id, {}, "Field update")
                     raiseError(data.data.message);
                 });
             }).catch(function (data) {
@@ -106,10 +106,10 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
             })
         }
 
-        function getNextMove() {
-            http.get("/move/automove").then(function () {
-                stompClient.send('/topic/movement/' + routeParams.id, {}, "lol")
-            }).catch(function () {
+        function getNextMove(playerType) {
+            http.post("/move/automove", playerType).then(function () {
+                stompClient.send('/topic/movement/' + routeParams.id, {}, "Field update")
+            }).catch(function (data) {
                 raiseError(data.data.message);
             });
         }
@@ -121,12 +121,20 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         };
 
         scope.startAutoplay = function () {
-            setInterval(stompClient.send('/topic/movement/' + routeParams.id, {}, "lol"), 60 * 1000);
+            setInterval(stompClient.send('/topic/movement/' + routeParams.id, {}, "Field update"), 60 * 1000);
             document.getElementById('autoplay').style.display = 'none';
             http.get("/move/autoplay").then(function () {
             }).catch(function () {
                 raiseError(data.data.message);
             });
+        };
+
+        scope.makeAutoMove = function () {
+            http.get('/move/turn').then(function () {
+                getNextMove(playerType);
+            }).catch(function (data) {
+                raiseError(data.data.message);
+            })
         };
 
         scope.getFieldsCords = function (fields) {
@@ -158,6 +166,7 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
             http.get('/game/' + routeParams.id).then(function (data) {
                 color = data.data.playerColor;
                 opColor = calculateOpColor(color);
+                scope.playerColor = color;
                 gameType = data.data.type;
                 showOrHide(gameType);
                 if (data.data.status === "SECOND_PLAYER_WON") {
@@ -186,7 +195,7 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         function getMoveHistory() {
             scope.movesInGame = [];
             return http.get('/move/list').then(function (data) {
-                if(data.data.length > 0){
+                if (data.data.length > 0) {
                     document.getElementById('autoplay').style.display = 'none';
                 }
                 scope.movesInGame = data.data;
@@ -240,8 +249,13 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         }
 
         function showOrHide(gameType) {
+            if (gameType === 'PvE') {
+                document.getElementById('autoMove').style.display = 'none';
+            }
             if (gameType === 'BOT_TRAINING') {
                 document.getElementById('buttons').style.display = 'none';
+                document.getElementById('autoMove').style.display = 'none';
+                document.getElementById('playerColor').style.display = 'none';
             } else {
                 document.getElementById('buttons').style.display = 'block';
                 document.getElementById('autoplay').style.display = 'none';

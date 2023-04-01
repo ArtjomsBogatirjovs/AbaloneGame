@@ -106,6 +106,22 @@ public abstract class GameUtil {
             }
         }
     }
+    public static Color getColorByPlayerType(String type, Gameplay currentGame, Player currentPlayer, Movement lastMove) {
+        Color color = currentGame.getSecondPlayerColor();
+        if (PlayerType.HUMAN.name().equals(type)) {
+            if (GameType.PvP.equals(currentGame.getGameType()) || GameType.PvE.equals(currentGame.getGameType())) {
+                return GameUtil.getPlayerColor(currentGame, currentPlayer);
+            }
+            if (lastMove != null) {
+                color = lastMove.getMovementColor() == Color.BLACK
+                        ? Color.WHITE
+                        : Color.BLACK;
+            } else {
+                color = currentGame.getFirstPlayerColor();
+            }
+        }
+        return color;
+    }
 
     public static String fieldCordToString(Field field) {
         String result = "";

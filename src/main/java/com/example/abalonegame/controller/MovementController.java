@@ -10,9 +10,7 @@ import com.example.abalonegame.bot.util.BotUtil;
 import com.example.abalonegame.db.entity.*;
 import com.example.abalonegame.dto.MoveDTO;
 import com.example.abalonegame.dto.CreateMoveDTO;
-import com.example.abalonegame.enums.Color;
-import com.example.abalonegame.enums.Direction;
-import com.example.abalonegame.enums.GameStatus;
+import com.example.abalonegame.enums.*;
 import com.example.abalonegame.service.*;
 import com.example.abalonegame.utils.BoardUtil;
 import com.example.abalonegame.utils.GameUtil;
@@ -94,14 +92,22 @@ public class MovementController {
         );
     }
 
-    @RequestMapping(value = "/automove", method = RequestMethod.GET)
-    public boolean createBotMove() {
+    @RequestMapping(value = "/automove", method = RequestMethod.POST)
+    public boolean createAutoMove(@RequestBody String type) {
         Long gameId = (Long) httpSession.getAttribute(BoardUtil.GAME_ID_ATTRIBUTE);
         Gameplay currentGame = gameplayService.getGameplay(gameId);
         Board currentBoard = boardService.getGameplayBoard(currentGame);
-        Color color = currentGame.getSecondPlayerColor();
-
-        makeBotMove(currentGame, currentBoard, color);
+        Color color = GameUtil.getColorByPlayerType(
+                type,
+                currentGame,
+                playerService.getLoggedUser(),
+                movementService.getLastMovement(currentBoard)
+        );
+        if (PlayerType.HUMAN.getName().equals(type)) {
+            makeBotMove(currentGame, currentBoard, color, playerService.getLoggedUser());
+        } else {
+            makeBotMove(currentGame, currentBoard, color);
+        }
         return true;
     }
 
@@ -119,6 +125,10 @@ public class MovementController {
     }
 
     private void makeBotMove(Gameplay currentGame, Board currentBoard, Color color) {
+        makeBotMove(currentGame, currentBoard, color, null);
+    }
+
+    private void makeBotMove(Gameplay currentGame, Board currentBoard, Color color, Player player) {
         Set<Field> gameBoardFields = fieldService.getGameBoardFields(currentBoard);
         ArrayList<SimpleField> stateFields = simpleFieldService.getOrCreateSimpleFields(gameBoardFields);
         GameState gameState = gameStateService.getOrCreateGameState(stateFields);
@@ -150,7 +160,7 @@ public class MovementController {
         }
         Movement move = movementService.createMove(
                 currentBoard,
-                null,
+                player,
                 currentGame,
                 bestMovement.getDirection(),
                 movementFields);

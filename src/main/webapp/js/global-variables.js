@@ -4,15 +4,17 @@ let gameState;
 let gameStatus;
 let color;
 let opColor;
+
 const boardColor = "#a8a098";
 const scale = 50;
 const hexagonHeight = scale * Math.cos(Math.PI / 6) * 2;
 const hexagonWidth = 1.5 * scale;
 const hexagons = {};
 const direction = {
-    x:0,
-    y:0
+    x: 0,
+    y: 0
 }
+
 const fieldDefinition = {
     a: 5,
     b: 6,
@@ -24,7 +26,8 @@ const fieldDefinition = {
     h: 6,
     i: 5,
 };
-const fieldEnum= {
+
+const fieldEnum = {
     1: 'a',
     2: 'b',
     3: 'c',
@@ -35,6 +38,9 @@ const fieldEnum= {
     8: 'h',
     9: 'i',
 };
+
+const botType = "BOT";
+const playerType = "HUMAN";
 
 
 
