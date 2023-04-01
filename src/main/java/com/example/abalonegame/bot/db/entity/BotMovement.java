@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -15,9 +16,13 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BotMovement extends Movement {
+    @Id
+    private long id;
     public static int DEFAULT_SCORE = 0;
     @Column
     private int score = 0;
     @ManyToOne(cascade = CascadeType.ALL)
     private GameState gameState;
+    @ManyToMany
+    private Set<SimpleField> simpleFieldSet;
 }

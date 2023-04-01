@@ -15,7 +15,7 @@ import java.util.List;
 @EqualsAndHashCode
 public class GameState {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id",nullable = false)
     private long id;
     @ManyToMany(cascade = CascadeType.ALL)

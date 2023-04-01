@@ -18,7 +18,7 @@ import javax.persistence.*;
 public class Field implements Cloneable{
     public final static int DROP_FIELD = 0;
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
     @Enumerated(EnumType.STRING)

@@ -27,6 +27,10 @@ public class FieldService {
         fieldRepository.saveAll(gameBoardFields);
     }
 
+    public void saveField(Field field) {
+        fieldRepository.save(field);
+    }
+
 
     public Field findFieldFromMap(Map<Coordinates, FieldCoordinates> map, Board board) {
         int x = map.get(Coordinates.X).getValue();

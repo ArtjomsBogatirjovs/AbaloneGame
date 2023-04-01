@@ -95,3 +95,11 @@ function calculateOpColor(color) {
         return 'BLACK';
     }
 }
+
+function hideColorChoose(gameType) {
+    if (gameType.value === 'LOCAL' || gameType.value === 'BOT_TRAINING') {
+        document.getElementById('colorChoose').style.display = "none";
+    } else {
+        document.getElementById('colorChoose').style.display = 'block';
+    }
+}

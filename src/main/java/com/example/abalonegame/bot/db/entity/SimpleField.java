@@ -14,7 +14,7 @@ import javax.persistence.*;
 @EqualsAndHashCode
 public class SimpleField {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
     @Enumerated(EnumType.STRING)

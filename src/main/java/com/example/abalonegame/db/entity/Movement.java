@@ -16,13 +16,14 @@ import java.util.Set;
 @EqualsAndHashCode
 public class Movement implements Cloneable{
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id",nullable = false)
     private long id;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Direction direction;
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinColumn
     private Set<Field> fields;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn

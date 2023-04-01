@@ -4,8 +4,8 @@ import com.example.abalonegame.db.entity.Field;
 import com.example.abalonegame.db.entity.Gameplay;
 import com.example.abalonegame.db.entity.Player;
 import com.example.abalonegame.db.repository.GameplayRepository;
-import com.example.abalonegame.dto.CreateGameDTO;
 import com.example.abalonegame.dto.GameDTO;
+import com.example.abalonegame.dto.CreateGameDTO;
 import com.example.abalonegame.enums.Color;
 import com.example.abalonegame.enums.GameStatus;
 import com.example.abalonegame.enums.GameType;
@@ -30,39 +30,46 @@ public class GameplayService {
         this.gameplayRepository = gameRepository;
     }
 
-    public Gameplay createGame(Player player, CreateGameDTO createGameDTO) {
+    public Gameplay createGame(Player player, GameDTO gameDTO) {
         Gameplay gameplay = new Gameplay();
-        GameType gameType = createGameDTO.getGameType();
-        gameplay.setPlayerOne(player);
-        if (GameType.LOCAL.equals(gameType)) { //TODO THINK ABOUT IT
+        GameType gameType = gameDTO.getGameType();
+        if (!gameType.equals(GameType.BOT_TRAINING)) {
+            gameplay.setPlayerOne(player);
+        }
+        if (GameType.LOCAL.equals(gameType)) {
             gameplay.setPlayerTwo(player);
         }
-        gameplay.setFirstPlayerColor(createGameDTO.getColor());
-        gameplay.setSecondPlayerColor(createGameDTO.getColor() == Color.WHITE ? Color.BLACK : Color.WHITE);
-        gameplay.setGameType(createGameDTO.getGameType());
-        gameplay.setStatus(createGameDTO.getGameType() == GameType.PvP ? GameStatus.WAITS_FOR_PLAYER : GameStatus.IN_PROGRESS);
+        gameplay.setFirstPlayerColor(gameDTO.getColor());
+        gameplay.setSecondPlayerColor(gameDTO.getColor() == Color.WHITE ? Color.BLACK : Color.WHITE);
+
+        if (gameplay.getFirstPlayerColor() == null) {
+            gameplay.setFirstPlayerColor(Color.BLACK);
+        }
+        gameplay.setGameType(gameDTO.getGameType());
+        gameplay.setStatus(gameDTO.getGameType() == GameType.PvP ? GameStatus.WAITS_FOR_PLAYER : GameStatus.IN_PROGRESS);
         gameplay.setCreated(new Date());
+        gameplay.setCreatedBy(player);
         validate(gameplay);
         return gameplay;
     }
 
-    public GameDTO createGameDTO(Gameplay gameplay, Set<Field> gameBoard,Color color) {
-        GameDTO gameDTO = new GameDTO();
-        gameDTO.setStatus(gameplay.getStatus());
-        gameDTO.setBallsCords(BoardUtil.convertGameBoardToResponse(gameBoard));
-        gameDTO.setGameId(gameplay.getId());
-        gameDTO.setPlayerOne(gameplay.getPlayerOne());
-        gameDTO.setPlayerTwo(gameplay.getPlayerTwo());
-        gameDTO.setType(gameplay.getGameType());
-        gameDTO.setPlayerColor(color);
-        return gameDTO;
+    public CreateGameDTO createGameDTO(Gameplay gameplay, Set<Field> gameBoard, Color color) {
+        CreateGameDTO createGameDTO = new CreateGameDTO();
+        createGameDTO.setStatus(gameplay.getStatus());
+        createGameDTO.setBallsCords(BoardUtil.convertGameBoardToResponse(gameBoard));
+        createGameDTO.setGameId(gameplay.getId());
+        createGameDTO.setPlayerOne(gameplay.getPlayerOne());
+        createGameDTO.setPlayerTwo(gameplay.getPlayerTwo());
+        createGameDTO.setType(gameplay.getGameType());
+        createGameDTO.setPlayerColor(color);
+        return createGameDTO;
     }
 
-    public Gameplay connectGame(Player player, CreateGameDTO createGameDTO) throws NotFoundException {
-        Gameplay gameplay = getGameplay(createGameDTO.getId());
+    public Gameplay connectGame(Player player, GameDTO gameDTO) throws NotFoundException {
+        Gameplay gameplay = getGameplay(gameDTO.getId());
         gameplay.setPlayerTwo(player);
         gameplay.setStatus(GameStatus.IN_PROGRESS);
-        gameplayRepository.save(gameplay); //TODO TO DIFFERENT PLACE
+        saveGame(gameplay);
         return gameplay;
     }
 
@@ -77,7 +84,9 @@ public class GameplayService {
     public List<Gameplay> getPlayerGames(Player player) {
         return gameplayRepository.findByStatusIn(new ArrayList<>(List.of(GameStatus.IN_PROGRESS, GameStatus.WAITS_FOR_PLAYER)))
                 .stream()
-                .filter(gameplay -> player.equals(gameplay.getPlayerOne()) || player.equals(gameplay.getPlayerTwo()))
+                .filter(gameplay -> player.equals(gameplay.getPlayerOne())
+                        || player.equals(gameplay.getPlayerTwo())
+                        || player.equals(gameplay.getCreatedBy()))
                 .sorted(Comparator.comparing(Gameplay::getCreated, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
     }
@@ -108,8 +117,8 @@ public class GameplayService {
         if (gameplay.getGameType() == null) {
             throw new ValidateException(ExceptionMessage.GAME_TYPE_NULL);
         }
-        if (gameplay.getFirstPlayerColor() == null) {
-            gameplay.setFirstPlayerColor(Color.BLACK);
+        if (!gameplay.getGameType().equals(GameType.BOT_TRAINING) && gameplay.getFirstPlayerColor() == null) {
+            throw new ValidateException(ExceptionMessage.INTERNAL_ERROR);
         }
     }
 

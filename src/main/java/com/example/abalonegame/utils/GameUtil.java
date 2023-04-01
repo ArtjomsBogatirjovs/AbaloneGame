@@ -96,10 +96,14 @@ public abstract class GameUtil {
     }
 
     public static Color getPlayerColor(Gameplay gameplay, Player player) {
-        if (gameplay.getPlayerOne().equals(player)) {
+        if (gameplay.getPlayerOne() == null) {
             return gameplay.getFirstPlayerColor();
         } else {
-            return gameplay.getSecondPlayerColor();
+            if (gameplay.getPlayerOne().equals(player)) {
+                return gameplay.getFirstPlayerColor();
+            } else {
+                return gameplay.getSecondPlayerColor();
+            }
         }
     }
 

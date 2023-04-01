@@ -4,8 +4,8 @@ import com.example.abalonegame.db.entity.Board;
 import com.example.abalonegame.db.entity.Field;
 import com.example.abalonegame.db.entity.Gameplay;
 import com.example.abalonegame.db.entity.Player;
-import com.example.abalonegame.dto.CreateGameDTO;
 import com.example.abalonegame.dto.GameDTO;
+import com.example.abalonegame.dto.CreateGameDTO;
 import com.example.abalonegame.exception.NotFoundException;
 import com.example.abalonegame.service.BoardService;
 import com.example.abalonegame.service.FieldService;
@@ -38,10 +38,10 @@ public class GameplayController {
     HttpSession httpSession;
 
     @PostMapping("/create")
-    public GameDTO start(@RequestBody CreateGameDTO createGameDTO) {
+    public CreateGameDTO start(@RequestBody GameDTO gameDTO) throws Exception {
         Player tempPlayer = playerService.getLoggedUser();
 
-        Gameplay gameplay = gameplayService.createGame(tempPlayer, createGameDTO);
+        Gameplay gameplay = gameplayService.createGame(tempPlayer, gameDTO);
         gameplayService.saveGame(gameplay);
 
         Board gameBoard = boardService.getNewBoard(gameplay);
@@ -50,7 +50,7 @@ public class GameplayController {
         Set<Field> gameBoardFields = BoardUtil.createGameBoardFields(gameBoard);
         fieldService.saveGameBoardFields(gameBoardFields);
 
-        httpSession.setAttribute("gameId", createGameDTO.getId());
+        httpSession.setAttribute("gameId", gameDTO.getId());
         return gameplayService.createGameDTO(gameplay, gameBoardFields, GameUtil.getPlayerColor(gameplay, tempPlayer));
     }
 
@@ -65,12 +65,12 @@ public class GameplayController {
     }
 
     @PostMapping("/connect")
-    public Gameplay connect(@RequestBody CreateGameDTO createGameDTO) throws NotFoundException {
-        return gameplayService.connectGame(playerService.getLoggedUser(), createGameDTO);
+    public Gameplay connect(@RequestBody GameDTO gameDTO) throws NotFoundException {
+        return gameplayService.connectGame(playerService.getLoggedUser(), gameDTO);
     }
 
     @RequestMapping(value = "/{id}")
-    public GameDTO getGameProperties(@PathVariable Long id) {
+    public CreateGameDTO getGameProperties(@PathVariable Long id) {
         Player tempPlayer = playerService.getLoggedUser();
         httpSession.setAttribute("gameId", id);
         Gameplay gameplay = gameplayService.getGameplay(id);

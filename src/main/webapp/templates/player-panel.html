@@ -12,17 +12,17 @@
                     <label for="gameType" class="col-md-2 control-label">Game type:</label>
                     <div class="col-md-8">
                         <select required class="form-control" name="gameType" id="gameType"
-                                ng-model="newGameData.gameType">
+                                ng-model="newGameData.gameType" onchange="hideColorChoose(this)">
                             <option ng-repeat="option in newGameOptions.availableGameTypes" value="{{option.name}}">
                                 {{option.name}}
                             </option>
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="piece" class="col-md-2 control-label">Play as:</label>
+                <div class="form-group" id="colorChoose">
+                    <label for="color" class="col-md-2 control-label">Play as:</label>
                     <div class="col-md-8">
-                        <select required class="form-control" id="piece"
+                        <select required class="form-control" id="color"
                                 ng-model="newGameData.color">
                             <option ng-repeat="option in newGameOptions.availableColors" value="{{option.name}}">
                                 {{option.name}}
@@ -79,9 +79,15 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="game in playerGames">
-                    <td>{{game.playerOne.name}}</td>
+                    <td><span ng-if="!game.playerOne">
+                            COMPUTER
+                        </span>
+                        <span ng-if="game.playerOne.name != ''">
+                            {{game.playerOne.name}}
+                        </span>
+                    </td>
                     <td>
-                        <span ng-if="game.gameType == 'PvE' ">
+                        <span ng-if="!game.playerTwo">
                             COMPUTER
                         </span>
                         <span ng-if="game.playerTwo.name != ''">

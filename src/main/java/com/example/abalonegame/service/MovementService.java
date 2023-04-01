@@ -88,7 +88,7 @@ public class MovementService {
         if (MovementUtil.isMoveToDropField(movement, gameBoard)) {
             throw new IllegalMovementException(ExceptionMessage.MOVE_TO_DROP_FIELD);
         }
-        if ((MovementUtil.isSumito(movement, gameBoard) && !MovementUtil.isPossibleToMoveOpponent(movement, gameBoard))) {
+        if (MovementUtil.isSumito(movement, gameBoard) && !MovementUtil.isPossibleToMoveOpponent(movement, gameBoard)) {
             throw new IllegalMovementException(ExceptionMessage.CANT_MOVE);
         }
         if (MovementUtil.isNeedToMoveBall(movement, gameBoard) && !MovementUtil.isPossibleToMoveOpponent(movement, gameBoard)) {
@@ -101,7 +101,7 @@ public class MovementService {
 
     public void validate(Movement movement, Movement lastMove) {
         Set<Field> movementFields = movement.getFields();
-        if (MovementUtil.isMovementsSameColor(movement, lastMove)) {
+        if (MovementUtil.isMovementsSameColor(movement, lastMove) && movement.getCreated() != null) {
             throw new ValidateException(ExceptionMessage.NOT_YOUR_TURN);
         }
         if (MovementUtil.isMovementWithoutBalls(movement)) {

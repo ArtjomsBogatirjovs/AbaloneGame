@@ -24,8 +24,6 @@ button:hover {
 }
 
 #buttons {
-    position: relative;
-    left: 400px;
     height: 100px;
     width: 300px;
 }
@@ -95,25 +93,23 @@ button:hover {
 
 #winBall {
     position: relative;
-    left: 100px;
     top: 100px;
     color: #000000;
     font-size: 36px;
     background: #33CCCC; /* Fallback */
     animation: colorGreen 9s infinite linear;
     text-align: center;
-    padding: 1em;
+    padding: 0.5em;
 }
 
 #loseBall {
     position: relative;
-    right: 100px;
     top: 100px;
     color: #000000;
     font-size: 36px;
     background: #33CCCC; /* Fallback */
     animation: colorRed 9s infinite linear;
     text-align: center;
-    padding: 1em;
+    padding: 0.5em;
 }
 

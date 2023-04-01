@@ -13,7 +13,8 @@ gameModule.controller('newGameController', ['$rootScope', '$scope', '$http', '$l
             availableGameTypes: [
                 {name: 'PvP'},
                 {name: 'PvE'},
-                {name: 'LOCAL'}
+                {name: 'LOCAL'},
+                {name: 'BOT_TRAINING'}
             ],
             selectedBoardDimension: {name: 'LOCAL'}
         };
@@ -38,7 +39,6 @@ gameModule.controller('newGameController', ['$rootScope', '$scope', '$http', '$l
     }
 ]);
 
-
 gameModule.controller('gamesToJoinController', ['$scope', '$http', '$location',
     function (scope, http, location) {
         scope.gamesToJoin = [];
@@ -61,7 +61,6 @@ gameModule.controller('gamesToJoinController', ['$scope', '$http', '$location',
         }
     }]);
 
-
 gameModule.controller('playerGamesController', ['$scope', '$http', '$location', '$routeParams',
     function (scope, http, location) {
         scope.playerGames = [];
@@ -76,7 +75,6 @@ gameModule.controller('playerGamesController', ['$scope', '$http', '$location', 
             location.path('/game/' + id);
         }
     }]);
-
 
 gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope', '$http',
     function (rootScope, routeParams, scope, http) {
@@ -112,15 +110,23 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
             http.get("/move/automove").then(function () {
                 stompClient.send('/topic/movement/' + routeParams.id, {}, "lol")
             }).catch(function () {
-                scope.errorMessage = "Can't send the move"
+                raiseError(data.data.message);
             });
-
         }
 
         scope.setDirection = function (dirX = 0, dirY = 0) {
             direction.x = dirX;
             direction.y = dirY;
             makePlayerMove();
+        };
+
+        scope.startAutoplay = function () {
+            setInterval(stompClient.send('/topic/movement/' + routeParams.id, {}, "lol"), 60 * 1000);
+            document.getElementById('autoplay').style.display = 'none';
+            http.get("/move/autoplay").then(function () {
+            }).catch(function () {
+                raiseError(data.data.message);
+            });
         };
 
         scope.getFieldsCords = function (fields) {
@@ -153,6 +159,7 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
                 color = data.data.playerColor;
                 opColor = calculateOpColor(color);
                 gameType = data.data.type;
+                showOrHide(gameType);
                 if (data.data.status === "SECOND_PLAYER_WON") {
                     Swal.fire(data.data.playerTwo + "WON");
                 }
@@ -179,6 +186,9 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         function getMoveHistory() {
             scope.movesInGame = [];
             return http.get('/move/list').then(function (data) {
+                if(data.data.length > 0){
+                    document.getElementById('autoplay').style.display = 'none';
+                }
                 scope.movesInGame = data.data;
             }).catch(function (data) {
                 raiseError(data.data.message);
@@ -227,6 +237,15 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         function raiseError(message) {
             Swal.fire(message)
             subscribe("/topic/movement/" + routeParams.id, initGameParams)
+        }
+
+        function showOrHide(gameType) {
+            if (gameType === 'BOT_TRAINING') {
+                document.getElementById('buttons').style.display = 'none';
+            } else {
+                document.getElementById('buttons').style.display = 'block';
+                document.getElementById('autoplay').style.display = 'none';
+            }
         }
 
         canvas.addEventListener("click", (event) => {

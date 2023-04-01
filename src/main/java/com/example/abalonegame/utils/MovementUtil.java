@@ -30,6 +30,7 @@ public abstract class MovementUtil {
     public static boolean isNeedToMoveBall(Movement move, Set<Field> gameBoard) {
         Direction direction = move.getDirection();
         Set<Field> fields = move.getFields();
+        fields = FieldUtil.findFieldsOnBoardByCords(gameBoard, fields);
 
         int xDir = direction.getX();
         int yDir = direction.getY();
@@ -44,16 +45,17 @@ public abstract class MovementUtil {
         return false;
     }
 
-    public static boolean isPossibleToMoveOpponent(Movement move, Set<Field> gameBoard) {//TODO make BallCounterService
+    public static boolean isPossibleToMoveOpponent(Movement move, Set<Field> gameBoard) {
         if (!isSumito(move, gameBoard)) {
             return false;
         }
         Set<Field> moveFields = move.getFields();
+        moveFields = FieldUtil.findFieldsOnBoardByCords(gameBoard, moveFields);
         ArrayList<Field> fields = new ArrayList<>(List.copyOf(moveFields));
+        BallCounter counter = new BallCounter();
+        counter.setBallTotal(fields.size() - 1);
 
-        int maxMoveBall = fields.size() - 1;
-        int ballToMove = 0;
-        int toIterate = fields.size() + maxMoveBall;
+        int toIterate = fields.size() + counter.getBallTotal();
 
         Field field = fields.get(0);
         int x = field.getX();
@@ -70,12 +72,12 @@ public abstract class MovementUtil {
             if (fields.contains(tempField)) {
                 continue;
             }
-            if (tempField.getColor() != null) {//getBall
-                ballToMove++;
+            if (tempField.getColor() != null) {
+                counter.count();
             } else {
                 return true;
             }
-            if (ballToMove > maxMoveBall) {
+            if (counter.getBallCount() > counter.getBallTotal()) {
                 return false;
             }
         }
@@ -104,7 +106,23 @@ public abstract class MovementUtil {
             if (fieldToMove.getColor() == null) {
                 return false;
             }
-            if (fieldToMove.getColor().equals(lastFieldInChain.getColor()) && !movementFields.contains(fieldToMove)) {
+            if (fieldToMove.getColor().equals(lastFieldInChain.getColor()) && !movementFields.contains(fieldToMove) && !isInSetSameField(fieldToMove, movementFields)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isSameFields(Field fieldOne, Field fieldTwo) {
+        boolean isEqualsX = fieldOne.getX() == fieldTwo.getX();
+        boolean isEqualsY = fieldOne.getY() == fieldTwo.getY();
+        boolean isEqualsColor = fieldOne.getColor() == fieldTwo.getColor();
+        return isEqualsX && isEqualsY && isEqualsColor;
+    }
+
+    public static boolean isInSetSameField(Field field, Set<Field> fields) {
+        for (Field tempField : fields) {
+            if (isSameFields(tempField, field)) {
                 return true;
             }
         }
@@ -171,6 +189,15 @@ public abstract class MovementUtil {
         if (gameplay == null) {
             return MovementUtil.detectFieldsColor(fields);
         }
+
+        if (gameplay.getPlayerOne() == null ) {
+            if (lastMovement == null) {
+                return gameplay.getFirstPlayerColor();
+            } else {
+                return MovementUtil.detectFieldsColor(fields);
+            }
+        }
+
         if (gameplay.getPlayerOne().equals(gameplay.getPlayerTwo())) {
             if (lastMovement == null) {
                 return gameplay.getFirstPlayerColor();
@@ -178,6 +205,7 @@ public abstract class MovementUtil {
                 return MovementUtil.detectFieldsColor(fields);
             }
         }
+
         return GameUtil.getPlayerColor(gameplay, player);
     }
 }

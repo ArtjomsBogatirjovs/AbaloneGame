@@ -51,6 +51,8 @@ public abstract class BoardUtil {
         Set<Field> movementFields = move.getFields();
         Direction direction = move.getDirection();
 
+        movementFields = FieldUtil.findFieldsOnBoardByCords(gameBoard, movementFields);
+
         if (movementFields == null || movementFields.isEmpty() || direction == null) {
             throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
         }

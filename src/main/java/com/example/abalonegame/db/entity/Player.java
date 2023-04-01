@@ -16,7 +16,7 @@ import javax.persistence.*;
 @EqualsAndHashCode
 public class Player {
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private int id;
     @Column(name = "name", unique = true, nullable = false)

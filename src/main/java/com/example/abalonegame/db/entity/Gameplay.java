@@ -25,7 +25,7 @@ public class Gameplay {
     @Column(name = "id", nullable = false)
     private long id;
     @ManyToOne
-    @JoinColumn(name = "first_player_id", nullable = false)
+    @JoinColumn(name = "first_player_id")
     private Player playerOne;
     @ManyToOne
     @JoinColumn(name = "second_player_id")
@@ -40,5 +40,8 @@ public class Gameplay {
     private GameStatus status;
     @Column(name = "created", nullable = false)
     private Date created;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Player createdBy;
 
 }

@@ -3,5 +3,6 @@ package com.example.abalonegame.enums;
 public enum GameType {
     PvP,
     PvE,
-    LOCAL
+    LOCAL,
+    BOT_TRAINING
 }
