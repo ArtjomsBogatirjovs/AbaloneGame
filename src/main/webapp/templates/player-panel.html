@@ -2,7 +2,7 @@
   ~ Author Artjoms Bogatirjovs 26.3.2023
   -->
 
-<div class="container">
+<div class="container-fluid">
     <div class="row">
         <!-- FORM for creating new game -->
         <div class="col-md-6">
@@ -79,7 +79,53 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="game in playerGames">
-                    <td><span ng-if="!game.playerOne">
+                    <td>{{game.playerOne.name}}
+                        <span ng-if="!game.playerOne">
+                            COMPUTER
+                        </span>
+                        <span ng-if="game.playerTwo.name != ''">
+                            {{game.playerTwo.name}}
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-if="!game.playerTwo">
+                            COMPUTER
+                        </span>
+                        <span ng-if="game.playerTwo.name != ''">
+                            {{game.playerTwo.name}}
+                        </span>
+                    </td>
+                    <td>{{game.status}}</td>
+                    <td>{{game.created | date:'dd-MM-yyyy HH:mm:ss'}}</td>
+                    <td>
+                        <button class="btn btn-sm" ng-click="loadGame(game.id)">
+                            <span class="glyphicon glyphicon-plus"></span> Load game
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div ng-show="!playerGames.length">
+                No games.
+            </div>
+        </div>
+    </div>
+    <!-- GAME HISTORY -->
+    <div class="col-md-6" ng-controller="playerGameHistory">
+        <h2 class="center">Game history</h2>
+        <div id="gameHistory">
+            <table class="table table-hover table-striped table-condensed" ng-show="playerGameHistory.length">
+                <thead>
+                <td>Started player</td>
+                <td>Second player</td>
+                <td>Game status</td>
+                <td>Created</td>
+                <td></td>
+                </thead>
+                <tbody>
+                <tr ng-repeat="game in playerGameHistory">
+                    <td>
+                        <span ng-if="!game.playerOne">
                             COMPUTER
                         </span>
                         <span ng-if="game.playerOne.name != ''">
@@ -104,7 +150,7 @@
                 </tr>
                 </tbody>
             </table>
-            <div ng-show="!playerGames.length">
+            <div ng-show="!playerGameHistory.length">
                 No games.
             </div>
         </div>

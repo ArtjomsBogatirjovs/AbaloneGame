@@ -81,6 +81,14 @@ public class GameplayService {
                 .collect(Collectors.toList());
     }
 
+    public List<Gameplay> getGameHistory(Player player) {
+        return gameplayRepository.findByCreatedByOrPlayerOneOrPlayerTwo(player, player, player)
+                .stream()
+                .filter(GameUtil::isFinished)
+                .sorted(Comparator.comparing(Gameplay::getCreated, Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+    }
+
     public List<Gameplay> getPlayerGames(Player player) {
         return gameplayRepository.findByStatusIn(new ArrayList<>(List.of(GameStatus.IN_PROGRESS, GameStatus.WAITS_FOR_PLAYER)))
                 .stream()

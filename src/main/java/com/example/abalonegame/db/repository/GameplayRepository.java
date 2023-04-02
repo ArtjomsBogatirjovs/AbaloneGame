@@ -1,6 +1,7 @@
 package com.example.abalonegame.db.repository;
 
 import com.example.abalonegame.db.entity.Gameplay;
+import com.example.abalonegame.db.entity.Player;
 import com.example.abalonegame.enums.GameStatus;
 import com.example.abalonegame.enums.GameType;
 import org.springframework.data.repository.CrudRepository;
@@ -14,4 +15,5 @@ public interface GameplayRepository extends CrudRepository<Gameplay, Long> {
     List<Gameplay> findByGameTypeAndStatus(GameType GameType, GameStatus status);
     List<Gameplay> findByStatus(GameStatus status);
     List<Gameplay> findByStatusIn(ArrayList<GameStatus> statuses);
+    List<Gameplay> findByCreatedByOrPlayerOneOrPlayerTwo(Player createPlayer, Player playerOne, Player playerTwo);
 }

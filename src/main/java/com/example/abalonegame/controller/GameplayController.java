@@ -64,6 +64,11 @@ public class GameplayController {
         return gameplayService.getPlayerGames(playerService.getLoggedUser());
     }
 
+    @RequestMapping(value = "/history", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Gameplay> getGameHistory() {
+        return gameplayService.getGameHistory(playerService.getLoggedUser());
+    }
+
     @PostMapping("/connect")
     public Gameplay connect(@RequestBody GameDTO gameDTO) throws NotFoundException {
         return gameplayService.connectGame(playerService.getLoggedUser(), gameDTO);

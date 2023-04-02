@@ -76,6 +76,21 @@ gameModule.controller('playerGamesController', ['$scope', '$http', '$location', 
         }
     }]);
 
+gameModule.controller('playerGameHistory', ['$scope', '$http', '$location', '$routeParams',
+    function (scope, http, location) {
+        scope.playerGameHistory = [];
+
+        http.get('/game/history').then(function (data) {
+            scope.playerGameHistory = data.data;
+        }).catch(function () {
+            location.path('/player/panel');
+        });
+
+        scope.loadGame = function (id) {
+            location.path('/game/' + id);
+        }
+    }]);
+
 gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope', '$http',
     function (rootScope, routeParams, scope, http) {
         var gameType;
@@ -169,10 +184,10 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
                 scope.playerColor = color;
                 gameType = data.data.type;
                 showOrHide(gameType);
-                if (data.data.status === "SECOND_PLAYER_WON") {
+                if (data.data.status === "SECOND_PLAYER_WON" && gameType !== 'BOT_TRAINING') {
                     Swal.fire(data.data.playerTwo.name + " WON");
                 }
-                if (data.data.status === "FIRST_PLAYER_WON") {
+                if (data.data.status === "FIRST_PLAYER_WON" && gameType !== 'BOT_TRAINING') {
                     Swal.fire(data.data.playerOne.name + " WON");
                 }
                 initGameBoard(data.data.ballsCords);

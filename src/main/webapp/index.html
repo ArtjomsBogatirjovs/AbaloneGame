@@ -4,6 +4,10 @@
 
 <head>
     <title>Player panel</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" media="screen" href="css/application.css">
 
@@ -20,7 +24,6 @@
     <script src="js/application.js"></script>
     <script src="js/GameModule.js"></script>
 
-
     <script defer src="js/global-variables.js"></script>
     <script defer src="js/renderer.js"></script>
 
@@ -32,9 +35,6 @@
             <a class="navbar-brand" href="/">Abalone game</a>
         </div>
         <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="#/about">About</a></li>
-            </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="/logout">Logout</a></li>
             </ul>
@@ -42,8 +42,20 @@
     </div>
 </nav>
 <div ng-view="name"></div>
-<footer class="text-center">
-    Abalone in Spring Boot and Angular JS
-</footer>
+    <div class="footer-basic">
+        <footer>
+            <div class="social">
+                <a href="https://www.instagram.com/temukeee"><i class="icon ion-social-instagram"></i></a>
+                <a href="https://www.facebook.com/artjom.bogatirjov"><i class="icon ion-social-facebook"></i></a>
+                <a href="https://github.com/ArtjomsBogatirjovs"><i class="fa fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/artjoms-bogatirjovs-88b027233"><i class="icon ion-social-linkedin"></i></a>
+            </div>
+            <ul class="list-inline">
+                <li class="list-inline-item"><a href="/">Home</a></li>
+                <li class="list-inline-item"><a href="#/about">About</a></li>
+            </ul>
+            <p class="copyright">Abalone in Spring Boot and Angular JS</p>
+        </footer>
+    </div>
 </body>
 </html>
