@@ -195,6 +195,9 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         function getMoveHistory() {
             scope.movesInGame = [];
             return http.get('/move/list').then(function (data) {
+                if(gameType === 'PvE' && !data.data.length && color === 'WHITE'){
+                    getNextMove(botType);
+                }
                 if (data.data.length > 0) {
                     document.getElementById('autoplay').style.display = 'none';
                 }

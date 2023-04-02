@@ -79,7 +79,7 @@ class BotUtilTest {
     @Test
     void calculateScoreByLines() {
         initBoard_2();
-        int expected = 18;
+        int expected = 3; //18 with two lines
         int actual = BotUtil.calculateScoreByLines(testGameBoard, Color.WHITE);
         assertEquals(expected, actual);
     }

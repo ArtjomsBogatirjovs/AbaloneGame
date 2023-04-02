@@ -102,16 +102,22 @@ public class BotMovementService extends MovementService {
         int score = BotMovement.DEFAULT_SCORE;
 
         int currentPlayerBalls = BotUtil.findFieldsByColor(copyOfBoard, movement.getMovementColor()).size();
-        score += currentPlayerBalls * 1000;
+        score += currentPlayerBalls * 5000;
 
         int opponentPlayerBalls = BotUtil.findFieldsByColor(copyOfBoard, opponentColor).size();
-        score -= opponentPlayerBalls * 1000;
+        score -= opponentPlayerBalls * 5000;
 
-        int currentPlayerMoves = currentPlayerMovements.size();
-        //score += currentPlayerMoves;
+        int opponentPlayerPushableBallsOutOfField = BotUtil.calculatePushableBallsOnEdge(copyOfBoard, opponentColor, currentPlayerMovements).size();
+        score += opponentPlayerPushableBallsOutOfField * 500;
 
-        int opponentPlayerMoves = opponentPlayerMovements.size();
-        // score -= opponentPlayerMoves;
+        int currentPlayerPushableBallsOutOfField = BotUtil.calculatePushableBallsOnEdge(copyOfBoard, movement.getMovementColor(), opponentPlayerMovements).size();
+        score -= currentPlayerPushableBallsOutOfField * 500;
+
+        int currentPlayerPushes = BotUtil.calculatePushableMoves(currentPlayerMovements, copyOfBoard);
+        score += currentPlayerPushes * 150;
+
+        int opponentPlayerPushes = BotUtil.calculatePushableMoves(opponentPlayerMovements, copyOfBoard);
+        score -= opponentPlayerPushes * 100;
 
         int currentPlayerCenterBalls = BotUtil.calculateScoreByBallsInCenter(copyOfBoard, movement.getMovementColor());
         score += currentPlayerCenterBalls * 50;
@@ -124,13 +130,13 @@ public class BotMovementService extends MovementService {
 
         int opponentPlayerLines = BotUtil.calculateScoreByLines(copyOfBoard, opponentColor);
         score -= opponentPlayerLines * 25;
-        //TODO Add possible ball pushes
 
-        int opponentPlayerPushableBallsOutOfField = BotUtil.calculatePushableBallsOnEdge(copyOfBoard, opponentColor, currentPlayerMovements).size();
-        score += opponentPlayerPushableBallsOutOfField * 125;
+        int currentPlayerMoves = currentPlayerMovements.size();
+        //score += currentPlayerMoves;
 
-        int currentPlayerPushableBallsOutOfField = BotUtil.calculatePushableBallsOnEdge(copyOfBoard, movement.getMovementColor(), opponentPlayerMovements).size();
-        score -= currentPlayerPushableBallsOutOfField * 125;
+        int opponentPlayerMoves = opponentPlayerMovements.size();
+        // score -= opponentPlayerMoves;
+
         return score;
     }
 }

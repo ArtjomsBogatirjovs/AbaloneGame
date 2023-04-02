@@ -16,7 +16,10 @@ public abstract class GameUtil {
             return true;
         }
         if (lastMovement == null) {
-            if (currentPlayer.equals(currentGameplay.getPlayerOne())) {
+            Color currentPlayerColor = currentPlayer.equals(currentGameplay.getPlayerOne())
+                    ? currentGameplay.getFirstPlayerColor()
+                    : currentGameplay.getSecondPlayerColor();
+            if (Color.BLACK.equals(currentPlayerColor)) {
                 return true;
             } else {
                 throw new ValidateException(ExceptionMessage.NOT_YOUR_TURN);
@@ -106,6 +109,7 @@ public abstract class GameUtil {
             }
         }
     }
+
     public static Color getColorByPlayerType(String type, Gameplay currentGame, Player currentPlayer, Movement lastMove) {
         Color color = currentGame.getSecondPlayerColor();
         if (PlayerType.HUMAN.name().equals(type)) {

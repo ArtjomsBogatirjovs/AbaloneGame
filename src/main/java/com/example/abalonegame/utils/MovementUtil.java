@@ -52,10 +52,10 @@ public abstract class MovementUtil {
         Set<Field> moveFields = move.getFields();
         moveFields = FieldUtil.findFieldsOnBoardByCords(gameBoard, moveFields);
         ArrayList<Field> fields = new ArrayList<>(List.copyOf(moveFields));
-        BallCounter counter = new BallCounter();
-        counter.setBallTotal(fields.size() - 1);
+        BasicCounter counter = new BasicCounter();
+        counter.setTotal(fields.size() - 1);
 
-        int toIterate = fields.size() + counter.getBallTotal();
+        int toIterate = fields.size() + counter.getTotal();
 
         Field field = fields.get(0);
         int x = field.getX();
@@ -77,7 +77,7 @@ public abstract class MovementUtil {
             } else {
                 return true;
             }
-            if (counter.getBallCount() > counter.getBallTotal()) {
+            if (counter.getCount() > counter.getTotal()) {
                 return false;
             }
         }

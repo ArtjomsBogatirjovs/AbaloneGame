@@ -11,23 +11,23 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BallCounter {
+public class BasicCounter {
     public static final int UNKNOWN = -1;
 
-    private int ballTotal = UNKNOWN;
-    private int ballCount = UNKNOWN;
+    private int total = UNKNOWN;
+    private int count = UNKNOWN;
 
     public void count() {
-        if (ballCount < 0) {
-            ballCount = 0;
+        if (count < 0) {
+            count = 0;
         }
-        ballCount++;
+        count++;
     }
 
-    public void count(int aBalls) {
-        if (ballCount < 0) {
-            ballCount = 0;
+    public void count(int addValue) {
+        if (count < 0) {
+            count = 0;
         }
-        ballCount++;
+        count += addValue;
     }
 }
