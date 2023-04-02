@@ -34,7 +34,7 @@
         <div class="center" style="overflow: scroll;height:800px;width:700px;">
             <h2 class="lead">History of moves in the game</h2>
             <table style="border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;"
-                   onmouseleave="board.drawGameState()" class="table table-hover table-striped table-condensed"
+                   onmouseleave="onHistoryLeave()" class="table table-hover table-striped table-condensed"
                    ng-show="movesInGame.length">
                 <thead>
                 <td>Player</td>

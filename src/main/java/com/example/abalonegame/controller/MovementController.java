@@ -172,6 +172,10 @@ public class MovementController {
         fieldService.saveGameBoardFields(gameBoardFields);
 
         GameStatus tempStatus = BoardUtil.checkIfPlayerWin(gameBoardFields, currentGame);
+        if (GameType.BOT_TRAINING.equals(currentGame.getGameType())
+                && movementService.getAllMovements(currentBoard).size() > Gameplay.MAX_MOVEMENTS_IN_GAME) {
+            tempStatus = GameStatus.FINISHED;
+        }
         gameplayService.updateGameStatus(currentGame, tempStatus);
     }
 }

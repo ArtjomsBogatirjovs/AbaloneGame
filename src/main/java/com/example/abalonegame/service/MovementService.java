@@ -83,6 +83,10 @@ public class MovementService {
         movementRepository.save(move);
     }
 
+    public List<Movement> getAllMovements(Board board) {
+        return movementRepository.findByBoard(board);
+    }
+
     public void validate(Movement movement, Set<Field> gameBoard, Movement lastMove) {
         validate(movement, lastMove);
         if (MovementUtil.isMoveToDropField(movement, gameBoard)) {

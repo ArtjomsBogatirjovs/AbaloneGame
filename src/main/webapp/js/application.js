@@ -103,3 +103,9 @@ function hideColorChoose(gameType) {
         document.getElementById('colorChoose').style.display = 'block';
     }
 }
+async function onHistoryLeave(){
+    await sleep(10);
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    board.drawBoard();
+    board.drawGameState();
+}

@@ -170,10 +170,10 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
                 gameType = data.data.type;
                 showOrHide(gameType);
                 if (data.data.status === "SECOND_PLAYER_WON") {
-                    Swal.fire(data.data.playerTwo + "WON");
+                    Swal.fire(data.data.playerTwo.name + " WON");
                 }
                 if (data.data.status === "FIRST_PLAYER_WON") {
-                    Swal.fire(data.data.playerOne + "WON");
+                    Swal.fire(data.data.playerOne.name + " WON");
                 }
                 initGameBoard(data.data.ballsCords);
             }).catch(function (data) {
@@ -254,6 +254,9 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         function showOrHide(gameType) {
             if (gameType === 'PvE') {
                 document.getElementById('autoMove').style.display = 'none';
+            }
+            if(gameType === 'LOCAL'){
+                document.getElementById('playerColor').style.display = 'none';
             }
             if (gameType === 'BOT_TRAINING') {
                 document.getElementById('buttons').style.display = 'none';
