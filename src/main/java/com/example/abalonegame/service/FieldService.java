@@ -22,7 +22,6 @@ public class FieldService {
         this.fieldRepository = fieldRepository;
     }
 
-
     public void saveGameBoardFields(Set<Field> gameBoardFields) {
         fieldRepository.saveAll(gameBoardFields);
     }

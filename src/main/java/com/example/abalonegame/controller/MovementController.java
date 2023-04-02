@@ -11,6 +11,7 @@ import com.example.abalonegame.db.entity.*;
 import com.example.abalonegame.dto.MoveDTO;
 import com.example.abalonegame.dto.CreateMoveDTO;
 import com.example.abalonegame.enums.*;
+import com.example.abalonegame.exception.ValidateException;
 import com.example.abalonegame.service.*;
 import com.example.abalonegame.utils.BoardUtil;
 import com.example.abalonegame.utils.GameUtil;
@@ -164,8 +165,13 @@ public class MovementController {
                 currentGame,
                 bestMovement.getDirection(),
                 movementFields);
+        try {
+            gameplayService.validate(currentGame);
+            // TODO write when bot lose -score of loser movements and +score of win movements
+        } catch (ValidateException e) {
+            throw e;
+        }
 
-        gameplayService.validate(currentGame);
         movementService.validateAndSave(move, gameBoardFields);
 
         BoardUtil.makeMove(gameBoardFields, move);

@@ -14,10 +14,10 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Movement implements Cloneable{
+public class Movement implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id",nullable = false)
+    @Column(name = "id", nullable = false)
     private long id;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -40,9 +40,7 @@ public class Movement implements Cloneable{
     @Override
     public Movement clone() {
         try {
-            Movement clone = (Movement) super.clone();
-            // TODO: copy mutable state here, so the clone can't change the internals of the original
-            return clone;
+            return (Movement) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

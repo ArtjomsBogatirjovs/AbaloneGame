@@ -190,7 +190,7 @@ public abstract class MovementUtil {
             return MovementUtil.detectFieldsColor(fields);
         }
 
-        if (gameplay.getPlayerOne() == null ) {
+        if (gameplay.getPlayerOne() == null) {
             if (lastMovement == null) {
                 return gameplay.getFirstPlayerColor();
             } else {

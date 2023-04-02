@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class BoardService { //TODO custom board create
+public class BoardService {
 
     private final BoardRepository boardRepository;
 

@@ -145,10 +145,7 @@ public abstract class FieldUtil {
         if (DROP_FIELD == y || y - x >= GAMING_BOARD_MIDDLE || DROP_FIELD == x) {
             return true;
         }
-        if (DROP_FIELD == opY || opY - opX >= GAMING_BOARD_MIDDLE || DROP_FIELD == opX) {
-            return true;
-        }
-        return false;
+        return DROP_FIELD == opY || opY - opX >= GAMING_BOARD_MIDDLE || DROP_FIELD == opX;
     }
 
     public static Set<Field> cloneFields(Set<Field> original) {

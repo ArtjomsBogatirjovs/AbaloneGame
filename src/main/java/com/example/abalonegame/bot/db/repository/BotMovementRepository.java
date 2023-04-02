@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface BotMovementRepository extends CrudRepository<BotMovement, Long> {
-    List<BotMovement> findBotMovementByGameStateAndAndMovementColorOrderByScoreDesc(GameState gameState, Color color);
+    List<BotMovement> findBotMovementByGameStateAndMovementColorOrderByScoreDesc(GameState gameState, Color color);
 
 }

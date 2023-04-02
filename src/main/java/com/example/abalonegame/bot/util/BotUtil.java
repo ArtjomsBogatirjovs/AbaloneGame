@@ -20,8 +20,6 @@ import com.example.abalonegame.utils.FieldUtil;
 import com.example.abalonegame.utils.MovementUtil;
 import com.google.common.collect.Sets;
 
-
-import java.awt.event.MouseEvent;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -63,7 +61,7 @@ public abstract class BotUtil {
         return counter.getCount();
     }
 
-    public static int calculateScoreByBallsInCenter(Set<Field> gameBoard, Color color) {//TODO Refactor findBallsByLevel fromLevel- toLevel
+    public static int calculateScoreByBallsInCenter(Set<Field> gameBoard, Color color) {
         int result = BotMovement.DEFAULT_SCORE;
         Field centerField = FieldUtil.findFieldOnBoardByCoords(Board.GAMING_BOARD_MIDDLE, Board.GAMING_BOARD_MIDDLE, gameBoard);
         Direction[] directions = Direction.values();
@@ -102,8 +100,8 @@ public abstract class BotUtil {
         int result = 0;
         Set<Set<Field>> lines = findAllLines(color, gameBoard, MovementUtil.MAX_BALLS_IN_LINES);
         long threeBallsInLine = countLinesNumber(lines, MovementUtil.MAX_BALLS_IN_LINES);
-        long twoBallsInLine = countLinesNumber(lines, MovementUtil.MIN_BALLS_IN_LINE);
-        result += threeBallsInLine; //TODO changed only for three balls and removed *3
+        //long twoBallsInLine = countLinesNumber(lines, MovementUtil.MIN_BALLS_IN_LINE);//TODO changed only for three balls and removed *3
+        result += threeBallsInLine;
         return result;
     }
 

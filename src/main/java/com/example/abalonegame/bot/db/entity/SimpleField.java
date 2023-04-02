@@ -2,8 +2,6 @@ package com.example.abalonegame.bot.db.entity;
 
 import com.example.abalonegame.enums.Color;
 import lombok.*;
-import org.hibernate.annotations.Polymorphism;
-import org.hibernate.annotations.PolymorphismType;
 
 import javax.persistence.*;
 

@@ -15,7 +15,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Setter
-public class Field implements Cloneable{
+public class Field implements Cloneable {
     public final static int DROP_FIELD = 0;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -44,9 +44,7 @@ public class Field implements Cloneable{
     @Override
     public Field clone() {
         try {
-            Field clone = (Field) super.clone();
-            // TODO: copy mutable state here, so the clone can't change the internals of the original
-            return clone;
+            return (Field) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

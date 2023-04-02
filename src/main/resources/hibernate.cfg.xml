@@ -14,13 +14,11 @@
     <!-- Annotated classes -->
     <mapping class="com.example.abalonegame.db.entity.Gameplay"/>
     <mapping class="com.example.abalonegame.db.entity.Board"/>
-    <mapping class="com.example.abalonegame.db.entity.Direction"/>
     <mapping class="com.example.abalonegame.db.entity.Field"/>
     <mapping class="com.example.abalonegame.db.entity.Movement"/>
     <mapping class="com.example.abalonegame.db.entity.Player"/>
     <mapping class="com.example.abalonegame.bot.db.entity.BotMovement"/>
     <mapping class="com.example.abalonegame.bot.db.entity.GameState"/>
-    <mapping class="com.example.abalonegame.bot.db.entity.AbaloneBot"/>
     <!-- DB schema will be updated if needed -->
     <!-- <property name="hibernate.hbm2ddl.auto">update</property> -->
   </session-factory>

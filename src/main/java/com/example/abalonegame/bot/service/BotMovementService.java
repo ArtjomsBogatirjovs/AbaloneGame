@@ -45,7 +45,7 @@ public class BotMovementService extends MovementService {
     }
 
     public List<Movement> getPossibleMovements(GameState gameState, Color color, Board board) {
-        ArrayList<Movement> existingMovements = new ArrayList<>(botMovementRepository.findBotMovementByGameStateAndAndMovementColorOrderByScoreDesc(gameState, color));
+        ArrayList<Movement> existingMovements = new ArrayList<>(botMovementRepository.findBotMovementByGameStateAndMovementColorOrderByScoreDesc(gameState, color));
         if (!existingMovements.isEmpty()) {
             return existingMovements;
         }
@@ -131,10 +131,10 @@ public class BotMovementService extends MovementService {
         int opponentPlayerLines = BotUtil.calculateScoreByLines(copyOfBoard, opponentColor);
         score -= opponentPlayerLines * 25;
 
-        int currentPlayerMoves = currentPlayerMovements.size();
+        //int currentPlayerMoves = currentPlayerMovements.size();
         //score += currentPlayerMoves;
 
-        int opponentPlayerMoves = opponentPlayerMovements.size();
+        //int opponentPlayerMoves = opponentPlayerMovements.size();
         // score -= opponentPlayerMoves;
 
         return score;
