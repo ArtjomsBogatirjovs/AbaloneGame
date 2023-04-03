@@ -184,10 +184,10 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
                 scope.playerColor = color;
                 gameType = data.data.type;
                 showOrHide(gameType);
-                if (data.data.status === "SECOND_PLAYER_WON" && gameType !== 'BOT_TRAINING') {
+                if (data.data.status === "SECOND_PLAYER_WON" && data.data.playerTwo !== null) {
                     Swal.fire(data.data.playerTwo.name + " WON");
                 }
-                if (data.data.status === "FIRST_PLAYER_WON" && gameType !== 'BOT_TRAINING') {
+                if (data.data.status === "FIRST_PLAYER_WON" && data.data.playerOne !== null) {
                     Swal.fire(data.data.playerOne.name + " WON");
                 }
                 initGameBoard(data.data.ballsCords);

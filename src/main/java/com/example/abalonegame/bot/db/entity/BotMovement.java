@@ -16,13 +16,11 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BotMovement extends Movement {
+    public static int DEFAULT_SCORE = 0;
     @Id
     private long id;
-    public static int DEFAULT_SCORE = 0;
     @Column
     private int score = 0;
-    @ManyToOne(cascade = CascadeType.ALL)
-    private GameState gameState;
     @ManyToMany
     private Set<SimpleField> simpleFieldSet;
 }

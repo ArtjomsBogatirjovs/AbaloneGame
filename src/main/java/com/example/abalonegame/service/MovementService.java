@@ -1,5 +1,6 @@
 package com.example.abalonegame.service;
 
+import com.example.abalonegame.bot.db.entity.GameState;
 import com.example.abalonegame.db.entity.*;
 import com.example.abalonegame.db.repository.MovementRepository;
 import com.example.abalonegame.dto.CreateMoveDTO;
@@ -28,17 +29,24 @@ public class MovementService {
     }
 
     public Movement createMove(Board board, Player player, Gameplay gameplay, Direction direction, Set<Field> fields) {
+        return createMove(board, player, gameplay, direction, fields, null);
+    }
+
+    public Movement createMove(Board board, Player player, Gameplay gameplay, Direction direction, Set<Field> fields, GameState gameState) {
         Color color = MovementUtil.getMovementColor(gameplay, player, fields, getLastMovement(board));
 
         Movement move = new Movement();
         move.setDirection(direction);
         move.setFields(fields);
         move.setMovementColor(color);
+        move.setBoard(board);
+        move.setPlayer(player);
         if (board != null && gameplay != null) {
             move.setCreated(new Date());
         }
-        move.setBoard(board);
-        move.setPlayer(player);
+        if (gameState != null) {
+            move.setGameState(gameState);
+        }
 
         return move;
     }

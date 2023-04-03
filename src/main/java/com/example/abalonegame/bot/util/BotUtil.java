@@ -117,7 +117,7 @@ public abstract class BotUtil {
                 result.addAll(diff);
             }
         }
-        return result;
+        return result;//TODO WRITE TEST FOR THIS
     }
 
     public static long countLinesNumber(Set<Set<Field>> lines, int lineSize) {

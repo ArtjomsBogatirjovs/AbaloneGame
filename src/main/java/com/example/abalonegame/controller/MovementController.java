@@ -164,7 +164,8 @@ public class MovementController {
                 player,
                 currentGame,
                 bestMovement.getDirection(),
-                movementFields);
+                movementFields,
+                bestMovement.getGameState());
         try {
             gameplayService.validate(currentGame);
             // TODO write when bot lose -score of loser movements and +score of win movements

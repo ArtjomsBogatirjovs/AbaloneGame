@@ -1,5 +1,6 @@
 package com.example.abalonegame.db.entity;
 
+import com.example.abalonegame.bot.db.entity.GameState;
 import com.example.abalonegame.enums.Color;
 import com.example.abalonegame.enums.Direction;
 import lombok.*;
@@ -27,7 +28,9 @@ public class Movement implements Cloneable {
     private Set<Field> fields;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn
-    private Board board;//TODO make not null
+    private Board board;
+    @ManyToOne(cascade = CascadeType.ALL)
+    private GameState gameState;
     @ManyToOne
     @JoinColumn(name = "player_id")
     private Player player;
