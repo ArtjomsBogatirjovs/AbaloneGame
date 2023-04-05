@@ -166,13 +166,8 @@ public class MovementController {
                 bestMovement.getDirection(),
                 movementFields,
                 bestMovement.getGameState());
-        try {
-            gameplayService.validate(currentGame);
-            // TODO write when bot lose -score of loser movements and +score of win movements
-        } catch (ValidateException e) {
-            throw e;
-        }
 
+        gameplayService.validate(currentGame);
         movementService.validateAndSave(move, gameBoardFields);
 
         BoardUtil.makeMove(gameBoardFields, move);
@@ -183,6 +178,33 @@ public class MovementController {
                 && movementService.getAllMovements(currentBoard).size() > Gameplay.MAX_MOVEMENTS_IN_GAME) {
             tempStatus = GameStatus.FINISHED;
         }
-        gameplayService.updateGameStatus(currentGame, tempStatus);
+        try {
+            gameplayService.updateGameStatus(currentGame, tempStatus);
+        } catch (ValidateException e) {
+            Color winnerColor = GameUtil.getWinnerColor(currentGame);
+            Color loserColor = Color.BLACK.equals(winnerColor) ? Color.WHITE : Color.BLACK;
+
+            List<Movement> winnerMovements = movementService.getMovementsByBoardAndColor(currentBoard, winnerColor);
+            List<Movement> loserMovements = movementService.getMovementsByBoardAndColor(currentBoard, loserColor);
+
+            addScoreToBotMovements(winnerMovements, 1);
+            addScoreToBotMovements(loserMovements, -1);
+
+            throw e;
+        }
+    }
+
+    private void addScoreToBotMovements(List<Movement> movements, int value) {
+        for (Movement move : movements) {
+            ArrayList<SimpleField> tempSimpleFieldSet = simpleFieldService.getOrCreateSimpleFields(move.getFields());
+            List<BotMovement> botMovements = botMovementService.findByMovement(move);
+            for (BotMovement botMovement : botMovements) {
+                ArrayList<SimpleField> movementSimpleFields = new ArrayList<>(botMovement.getSimpleFieldSet());
+                if (BotUtil.isSimpleFieldEquals(tempSimpleFieldSet, movementSimpleFields)) {
+                    botMovement.setScore(botMovement.getScore() + value);
+                    botMovementService.saveBotMove(botMovement);
+                }
+            }
+        }
     }
 }

@@ -20,6 +20,7 @@ import com.example.abalonegame.utils.FieldUtil;
 import com.example.abalonegame.utils.MovementUtil;
 import com.google.common.collect.Sets;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +39,18 @@ public abstract class BotUtil {
             result.add(createField(sf));
         }
         return result;
+    }
+
+    public static boolean isSimpleFieldEquals(ArrayList<SimpleField> simpleFields, ArrayList<SimpleField> simpleFields2) {
+        for (SimpleField simpleField : simpleFields) {
+            if (simpleFields.size() != simpleFields2.size()) {
+                return false;
+            }
+            if (!simpleFields2.contains(simpleField)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static Field createField(SimpleField simpleField) {

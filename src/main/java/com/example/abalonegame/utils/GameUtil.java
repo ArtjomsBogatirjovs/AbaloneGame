@@ -150,5 +150,16 @@ public abstract class GameUtil {
                 .findAny()
                 .get();
     }
+
+    public static Color getWinnerColor(Gameplay gameplay) {
+        if (!isFinished(gameplay)) {
+            throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
+        }
+        if (GameStatus.FIRST_PLAYER_WON.equals(gameplay.getStatus())) {
+            return gameplay.getFirstPlayerColor();
+        } else {
+            return gameplay.getSecondPlayerColor();
+        }
+    }
 }
 

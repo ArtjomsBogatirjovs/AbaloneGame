@@ -40,8 +40,11 @@ public class BotMovementService extends MovementService {
         botMovement.setSimpleFieldSet(fields);
         botMovement.setDirection(movement.getDirection());
         botMovement.setMovementColor(movement.getMovementColor());
-        botMovementRepository.save(botMovement);
+        saveBotMove(botMovement);
         return botMovement;
+    }
+    public void saveBotMove(BotMovement botMovement){
+        botMovementRepository.save(botMovement);
     }
 
     public List<Movement> getPossibleMovements(GameState gameState, Color color, Board board) {
@@ -138,5 +141,9 @@ public class BotMovementService extends MovementService {
         // score -= opponentPlayerMoves;
 
         return score;
+    }
+    public List<BotMovement> findByMovement(Movement movement){
+        return botMovementRepository.findBotMovementByGameStateAndMovementColorAndDirection(
+                movement.getGameState(),movement.getMovementColor(),movement.getDirection());
     }
 }

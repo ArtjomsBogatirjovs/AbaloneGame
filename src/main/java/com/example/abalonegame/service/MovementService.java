@@ -47,7 +47,6 @@ public class MovementService {
         if (gameState != null) {
             move.setGameState(gameState);
         }
-
         return move;
     }
 
@@ -75,6 +74,10 @@ public class MovementService {
 
     public int getTheNumberOfPlayerMovesInGame(Board board, Player player) {
         return movementRepository.countByBoardAndPlayer(board, player);
+    }
+
+    public List<Movement> getMovementsByBoardAndColor(Board board, Color color) {
+        return movementRepository.findByBoardAndMovementColorAndCreatedIsNotNull(board, color);
     }
 
     public Movement getLastMovement(Board currentBoard) {
