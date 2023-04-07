@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 @Service
 public class BotMovementService extends MovementService {
@@ -40,14 +41,20 @@ public class BotMovementService extends MovementService {
         botMovement.setSimpleFieldSet(fields);
         botMovement.setDirection(movement.getDirection());
         botMovement.setMovementColor(movement.getMovementColor());
-        saveBotMove(botMovement);
         return botMovement;
     }
-    public void saveBotMove(BotMovement botMovement){
+
+    public void saveBotMovements(List<BotMovement> botMovements){
+        for (BotMovement tempMove : botMovements){
+            saveBotMove(tempMove);
+        }
+    }
+
+    public void saveBotMove(BotMovement botMovement) {
         botMovementRepository.save(botMovement);
     }
 
-    public List<Movement> getPossibleMovements(GameState gameState, Color color, Board board) {
+    public List<Movement> getPossibleMovements(GameState gameState, Color color, Board board) throws ExecutionException, InterruptedException {
         ArrayList<Movement> existingMovements = new ArrayList<>(botMovementRepository.findBotMovementByGameStateAndMovementColorOrderByScoreDesc(gameState, color));
         if (!existingMovements.isEmpty()) {
             return existingMovements;
@@ -65,36 +72,51 @@ public class BotMovementService extends MovementService {
 
     }
 
-
-    public Set<Movement> findPossibleMovements(Color color, Set<Field> gameBoard, Movement lastMove) {
+    public Set<Movement> findPossibleMovements(Color color, Set<Field> gameBoard, Movement lastMove) throws InterruptedException, ExecutionException {
         Set<Field> fieldsWithColor = BotUtil.findFieldsByColor(gameBoard, color);
         Set<Movement> result = new HashSet<>();
+        int numThreads = Runtime.getRuntime().availableProcessors();
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+        List<Future<Set<Movement>>> futures = new ArrayList<>();
+
         for (Field f : fieldsWithColor) {
             if (f.getColor() == null) {
                 throw new InternalException(ExceptionMessage.INTERNAL_ERROR);
             }
-            for (Direction dir : Direction.values()) {
-                for (int i = 1; i <= MovementUtil.MAX_BALLS_IN_LINES; i++) {
-                    for (Direction fieldsDir : Direction.values()) {
-                        Set<Field> fieldsToMove = new HashSet<>(Set.of(f));
-                        try {
-                            BotUtil.tryCreateLineInDirection(gameBoard, f, i, fieldsDir, fieldsToMove);
-                            Movement simpleMove = simpleMove(dir, fieldsToMove);
-                            validate(simpleMove, gameBoard, lastMove);
-                            result.add(simpleMove);
-                        } catch (ValidateException ignored) {
-                        }
-                        if (i == 1) {
-                            break;
+            futures.add(executor.submit(() -> {
+                Set<Movement> moves = new HashSet<>();
+                for (Direction dir : Direction.values()) {
+                    for (int i = 1; i <= MovementUtil.MAX_BALLS_IN_LINES; i++) {
+                        for (Direction fieldsDir : Direction.values()) {
+                            Set<Field> fieldsToMove = new HashSet<>(Set.of(f));
+                            try {
+                                BotUtil.tryCreateLineInDirection(gameBoard, f, i, fieldsDir, fieldsToMove);
+                                Movement simpleMove = simpleMove(dir, fieldsToMove);
+                                validate(simpleMove, gameBoard, lastMove);
+                                moves.add(simpleMove);
+                            } catch (ValidateException ignored) {
+                            }
+                            if (i == 1) {
+                                break;
+                            }
                         }
                     }
                 }
-            }
+                return moves;
+            }));
         }
+
+        executor.shutdown();
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+
+        for (Future<Set<Movement>> future : futures) {
+            result.addAll(future.get());
+        }
+
         return result;
     }
 
-    public int calculateMoveScore(Set<Field> gameBoard, Movement movement, Movement lastMove) {
+    public int calculateMoveScore(Set<Field> gameBoard, Movement movement, Movement lastMove) throws ExecutionException, InterruptedException {
         Set<Field> copyOfBoard = FieldUtil.cloneFields(gameBoard);
         BoardUtil.makeMove(copyOfBoard, movement);
 
@@ -142,8 +164,9 @@ public class BotMovementService extends MovementService {
 
         return score;
     }
-    public List<BotMovement> findByMovement(Movement movement){
+
+    public List<BotMovement> findByMovement(Movement movement) {
         return botMovementRepository.findBotMovementByGameStateAndMovementColorAndDirection(
-                movement.getGameState(),movement.getMovementColor(),movement.getDirection());
+                movement.getGameState(), movement.getMovementColor(), movement.getDirection());
     }
 }

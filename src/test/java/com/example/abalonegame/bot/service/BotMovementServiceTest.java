@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -28,13 +29,13 @@ class BotMovementServiceTest {
     }
 
     @Test
-    void findMovementsWithOneBall() {
+    void findMovementsWithOneBall() throws ExecutionException, InterruptedException {
         initGameBoard_full();
         assertEquals(44, botMovementService.findPossibleMovements(Color.WHITE, testGameBoard, null).size());
         assertEquals(44, botMovementService.findPossibleMovements(Color.BLACK, testGameBoard, null).size());
     }
     @Test
-    void findMovementsWithThreeBalls() {
+    void findMovementsWithThreeBalls() throws ExecutionException, InterruptedException {
         initBoard_1();
         assertEquals(3, botMovementService.findPossibleMovements(Color.BLACK, testGameBoard, null).size());
     }

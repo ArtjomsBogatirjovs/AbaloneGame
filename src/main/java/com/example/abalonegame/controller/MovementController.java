@@ -23,6 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @RestController
 @RequestMapping("/move")
@@ -94,7 +98,7 @@ public class MovementController {
     }
 
     @RequestMapping(value = "/automove", method = RequestMethod.POST)
-    public boolean createAutoMove(@RequestBody String type) {
+    public boolean createAutoMove(@RequestBody String type) throws ExecutionException, InterruptedException {
         Long gameId = (Long) httpSession.getAttribute(BoardUtil.GAME_ID_ATTRIBUTE);
         Gameplay currentGame = gameplayService.getGameplay(gameId);
         Board currentBoard = boardService.getGameplayBoard(currentGame);
@@ -113,7 +117,7 @@ public class MovementController {
     }
 
     @RequestMapping(value = "/autoplay", method = RequestMethod.GET)
-    public boolean autoplay() {
+    public boolean autoplay() throws ExecutionException, InterruptedException {
         Long gameId = (Long) httpSession.getAttribute(BoardUtil.GAME_ID_ATTRIBUTE);
         Gameplay currentGame = gameplayService.getGameplay(gameId);
         Board currentBoard = boardService.getGameplayBoard(currentGame);
@@ -125,32 +129,48 @@ public class MovementController {
         return true;
     }
 
-    private void makeBotMove(Gameplay currentGame, Board currentBoard, Color color) {
+    private void makeBotMove(Gameplay currentGame, Board currentBoard, Color color) throws ExecutionException, InterruptedException {
         makeBotMove(currentGame, currentBoard, color, null);
     }
 
-    private void makeBotMove(Gameplay currentGame, Board currentBoard, Color color, Player player) {
+    private void makeBotMove(Gameplay currentGame, Board currentBoard, Color color, Player player) throws ExecutionException, InterruptedException {
         Set<Field> gameBoardFields = fieldService.getGameBoardFields(currentBoard);
         ArrayList<SimpleField> stateFields = simpleFieldService.getOrCreateSimpleFields(gameBoardFields);
         GameState gameState = gameStateService.getOrCreateGameState(stateFields);
         Movement lastMove = botMovementService.getLastMovement(currentBoard);
 
         List<Movement> possibleMovements = botMovementService.getPossibleMovements(gameState, color, currentBoard);
-        ArrayList<BotMovement> existingMovements = new ArrayList<>();
 
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        List<Future<BotMovement>> futures = new ArrayList<>();
         for (Movement tempMove : possibleMovements) {
-            if (tempMove instanceof BotMovement) {
-                existingMovements.add((BotMovement) tempMove);
-                continue;
-            }
-            Set<Field> tempGameBoard = BotUtil.simpleFieldsToFields(gameState.getStateFields());
-            int moveScore = botMovementService.calculateMoveScore(tempGameBoard, tempMove, lastMove);
-            BotMovement tempBotMove = botMovementService.createBotMove(tempMove,
-                    gameState,
-                    moveScore,
-                    new HashSet<>(simpleFieldService.getOrCreateSimpleFields(tempMove.getFields())));
-            existingMovements.add(tempBotMove);
+            Future<BotMovement> future = executorService.submit(() -> {
+                if (tempMove instanceof BotMovement) {
+                    return (BotMovement) tempMove;
+                }
+                Set<Field> tempGameBoard = BotUtil.simpleFieldsToFields(gameState.getStateFields());
+                int moveScore = botMovementService.calculateMoveScore(tempGameBoard, tempMove, lastMove);
+                BotMovement tempBotMove = botMovementService.createBotMove(tempMove,
+                        gameState,
+                        moveScore,
+                        new HashSet<>(simpleFieldService.getOrCreateSimpleFields(tempMove.getFields())));
+                return tempBotMove;
+            });
+            futures.add(future);
         }
+
+        ArrayList<BotMovement> existingMovements = new ArrayList<>();
+        for (Future<BotMovement> future : futures) {
+            try {
+                BotMovement botMovement = future.get();
+                existingMovements.add(botMovement);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        executorService.shutdown();
+
+        botMovementService.saveBotMovements(existingMovements);
         BotMovement bestMovement = existingMovements.stream()
                 .max(Comparator.comparing((BotMovement::getScore)))
                 .get();
