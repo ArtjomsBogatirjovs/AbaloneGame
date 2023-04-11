@@ -19,7 +19,7 @@ import java.util.Date;
 @Entity
 @EqualsAndHashCode
 public class Gameplay {
-    public static int MAX_MOVEMENTS_IN_GAME = 1000;
+    public static int MAX_MOVEMENTS_IN_GAME = 350;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

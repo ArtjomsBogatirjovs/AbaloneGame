@@ -7,6 +7,7 @@ import com.example.abalonegame.bot.db.repository.BotMovementRepository;
 import com.example.abalonegame.bot.util.BotUtil;
 import com.example.abalonegame.db.entity.Board;
 import com.example.abalonegame.db.entity.Field;
+import com.example.abalonegame.db.entity.Gameplay;
 import com.example.abalonegame.db.entity.Movement;
 import com.example.abalonegame.db.repository.MovementRepository;
 import com.example.abalonegame.enums.Color;
@@ -26,6 +27,7 @@ import java.util.concurrent.*;
 
 @Service
 public class BotMovementService extends MovementService {
+    public int MAX_DEPTH = 1;
     private final BotMovementRepository botMovementRepository;
 
     @Autowired
@@ -44,8 +46,8 @@ public class BotMovementService extends MovementService {
         return botMovement;
     }
 
-    public void saveBotMovements(List<BotMovement> botMovements){
-        for (BotMovement tempMove : botMovements){
+    public void saveBotMovements(List<BotMovement> botMovements) {
+        for (BotMovement tempMove : botMovements) {
             saveBotMove(tempMove);
         }
     }
@@ -116,6 +118,97 @@ public class BotMovementService extends MovementService {
         return result;
     }
 
+    public int evaluate(Set<Field> gameBoard, Color color, Movement lastMove) throws ExecutionException, InterruptedException {
+
+        Color oppColor = color == Color.BLACK ? Color.WHITE : Color.BLACK;
+        Set<Movement> currentPlayerMovements = findPossibleMovements(color, gameBoard, lastMove);
+        Set<Movement> opponentPlayerMovements = findPossibleMovements(oppColor, gameBoard, lastMove);
+
+        int score = BotMovement.DEFAULT_SCORE;
+
+        int currentPlayerBalls = BotUtil.findFieldsByColor(gameBoard, color).size();
+        score += currentPlayerBalls * 5000;
+
+        int opponentPlayerBalls = BotUtil.findFieldsByColor(gameBoard, oppColor).size();
+        score -= opponentPlayerBalls * 5000;
+
+        int opponentPlayerPushableBallsOutOfField = BotUtil.calculatePushableBallsOnEdge(gameBoard, oppColor, currentPlayerMovements).size();
+        score += opponentPlayerPushableBallsOutOfField * 500;
+
+        int currentPlayerPushableBallsOutOfField = BotUtil.calculatePushableBallsOnEdge(gameBoard, color, opponentPlayerMovements).size();
+        score -= currentPlayerPushableBallsOutOfField * 500;
+
+        int currentPlayerPushes = BotUtil.calculatePushableMoves(currentPlayerMovements, gameBoard);
+        score += currentPlayerPushes * 150;
+
+        int opponentPlayerPushes = BotUtil.calculatePushableMoves(opponentPlayerMovements, gameBoard);
+        score -= opponentPlayerPushes * 100;
+
+        int currentPlayerCenterBalls = BotUtil.calculateScoreByBallsInCenter(gameBoard, color);
+        score += currentPlayerCenterBalls * 50;
+
+        int opponentPlayerCenterBalls = BotUtil.calculateScoreByBallsInCenter(gameBoard, oppColor);
+        score -= opponentPlayerCenterBalls * 50;
+
+        int currentPlayerLines = BotUtil.calculateScoreByLines(gameBoard, color);
+        score += currentPlayerLines;
+
+        int opponentPlayerLines = BotUtil.calculateScoreByLines(gameBoard, oppColor);
+        score -= opponentPlayerLines * 25;
+
+        //int currentPlayerMoves = currentPlayerMovements.size();
+        //score += currentPlayerMoves;
+
+        //int opponentPlayerMoves = opponentPlayerMovements.size();
+        // score -= opponentPlayerMoves;
+
+        return score;
+    }
+
+    public List<BotMovement> findByMovement(Movement movement) {
+        return botMovementRepository.findBotMovementByGameStateAndMovementColorAndDirection(
+                movement.getGameState(), movement.getMovementColor(), movement.getDirection());
+    }
+
+    public int minimax(Set<Field> gameBoardFields, Gameplay gameplay, Movement movement, Movement lastMove, int depth, boolean isMaxPlayer, Color color, int alpha, int beta) throws ExecutionException, InterruptedException {
+        Set<Field> copyOfBoard = FieldUtil.cloneFields(gameBoardFields);
+        BoardUtil.makeMove(copyOfBoard, movement);
+        if (depth == MAX_DEPTH || BoardUtil.checkIfPlayerWin(copyOfBoard, gameplay) != null) {
+            return evaluate(copyOfBoard, color, lastMove);
+        }
+
+        Color oppColor = color == Color.BLACK
+                ? Color.WHITE
+                : Color.BLACK;
+
+        int score;
+        if (isMaxPlayer) {
+            score = Integer.MIN_VALUE;
+            Set<Movement> possibleMovements = findPossibleMovements(color, copyOfBoard, lastMove);
+            for (Movement move : possibleMovements) {
+                int newScore = minimax(copyOfBoard, gameplay, move, lastMove, depth + 1, false, oppColor, alpha, beta);
+                score = Math.max(score, newScore);
+                alpha = Math.max(alpha, score);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return score;
+        } else {
+            score = Integer.MAX_VALUE;
+            Set<Movement> possibleMovements = findPossibleMovements(color, copyOfBoard, lastMove);
+            for (Movement move : possibleMovements) {
+                int newScore = minimax(copyOfBoard, gameplay, move, lastMove, depth + 1, true, oppColor, alpha, beta);
+                score = Math.min(score, newScore);
+                beta = Math.min(beta, score);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return score;
+        }
+    }
+
     public int calculateMoveScore(Set<Field> gameBoard, Movement movement, Movement lastMove) throws ExecutionException, InterruptedException {
         Set<Field> copyOfBoard = FieldUtil.cloneFields(gameBoard);
         BoardUtil.makeMove(copyOfBoard, movement);
@@ -163,10 +256,5 @@ public class BotMovementService extends MovementService {
         // score -= opponentPlayerMoves;
 
         return score;
-    }
-
-    public List<BotMovement> findByMovement(Movement movement) {
-        return botMovementRepository.findBotMovementByGameStateAndMovementColorAndDirection(
-                movement.getGameState(), movement.getMovementColor(), movement.getDirection());
     }
 }

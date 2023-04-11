@@ -83,6 +83,22 @@ public class MovementController {
         return movementService.getMovesInGame(board);
     }
 
+    @RequestMapping(value = "/possible", method = RequestMethod.GET)
+    public int getPossibleMove() throws ExecutionException, InterruptedException {
+        Long gameId = (Long) httpSession.getAttribute(BoardUtil.GAME_ID_ATTRIBUTE);
+        Gameplay gameplay = gameplayService.getGameplay(gameId);
+        Board board = boardService.getGameplayBoard(gameplay);
+
+        Set<Field> gameBoardFields = fieldService.getGameBoardFields(board);
+        ArrayList<SimpleField> stateFields = simpleFieldService.getOrCreateSimpleFields(gameBoardFields);
+        GameState gameState = gameStateService.getOrCreateGameState(stateFields);
+
+        Player player = playerService.getLoggedUser();
+        Color color = GameUtil.getPlayerColor(gameplay, player);
+
+        return botMovementService.getPossibleMovements(gameState, color, board).size();
+    }
+
     @RequestMapping(value = "/turn", method = RequestMethod.GET)
     public boolean isPlayerTurn() {
         Long gameId = (Long) httpSession.getAttribute(BoardUtil.GAME_ID_ATTRIBUTE);
@@ -149,7 +165,17 @@ public class MovementController {
                     return (BotMovement) tempMove;
                 }
                 Set<Field> tempGameBoard = BotUtil.simpleFieldsToFields(gameState.getStateFields());
-                int moveScore = botMovementService.calculateMoveScore(tempGameBoard, tempMove, lastMove);
+
+                int moveScore = botMovementService.minimax(tempGameBoard,
+                        currentGame,
+                        tempMove,
+                        lastMove,
+                        1,
+                        false,
+                        tempMove.getMovementColor(),
+                        Integer.MIN_VALUE,
+                        Integer.MAX_VALUE);
+
                 BotMovement tempBotMove = botMovementService.createBotMove(tempMove,
                         gameState,
                         moveScore,

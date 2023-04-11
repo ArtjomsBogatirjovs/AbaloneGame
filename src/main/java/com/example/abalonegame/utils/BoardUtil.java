@@ -46,6 +46,35 @@ public abstract class BoardUtil {
         }
         return gameBoard;
     }
+    public static Set<Field> createGameBoardFieldsSmall(Board board) {
+        Set<Field> gameBoard = new HashSet<>();
+        for (int x = 0; x <= GAMING_BOARD_MIDDLE; x++) {
+            for (int y = 0; y < BOARD_SIZE; y++) {
+
+                if (x == GAMING_BOARD_MIDDLE && y > GAMING_BOARD_MIDDLE) {
+                    break;
+                }
+
+                if (FieldUtil.isDropField(x, y)) {
+                    int opX = GameUtil.calculateOppositeCord(x);
+                    int opY = GameUtil.calculateOppositeCord(y);
+                    gameBoard.add(new Field(null, board, x, y, true));
+                    gameBoard.add(new Field(null, board, opX, opY, true));
+                } else if (y < 5 && x < y)  {
+                    int opX = GameUtil.calculateOppositeCord(x);
+                    int opY = GameUtil.calculateOppositeCord(y);
+                    gameBoard.add(new Field(Color.BLACK, board, x, y, false));
+                    gameBoard.add(new Field(Color.WHITE, board, opX, opY, false));
+                } else {
+                    int opX = GameUtil.calculateOppositeCord(x);
+                    int opY = GameUtil.calculateOppositeCord(y);
+                    gameBoard.add(new Field(null, board, x, y, false));
+                    gameBoard.add(new Field(null, board, opX, opY, false));
+                }
+            }
+        }
+        return gameBoard;
+    }
 
     public static void makeMove(Set<Field> gameBoard, Movement move) {
         Set<Field> movementFields = move.getFields();

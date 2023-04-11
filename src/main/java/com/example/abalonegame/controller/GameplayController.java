@@ -47,7 +47,8 @@ public class GameplayController {
         Board gameBoard = boardService.getNewBoard(gameplay);
         boardService.saveBoard(gameBoard);
 
-        Set<Field> gameBoardFields = BoardUtil.createGameBoardFields(gameBoard);
+        Set<Field> gameBoardFields = BoardUtil.createGameBoardFields(gameBoard); //TODO CHANGED on small board
+        //Set<Field> gameBoardFields = BoardUtil.createGameBoardFieldsSmall(gameBoard);
         fieldService.saveGameBoardFields(gameBoardFields);
 
         httpSession.setAttribute("gameId", gameDTO.getId());

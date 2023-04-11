@@ -199,12 +199,13 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
         function initGameBoard(newGameState) {
             selectedField = [];
             gameState = newGameState;
-            scope.ballToLose = gameState[color].length - 8;
-            scope.ballToWin = gameState[opColor].length - 8;
+            scope.ballToLose = gameState[color].length - winBalls;
+            scope.ballToWin = gameState[opColor].length - winBalls;
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             board.drawBoard();
             board.drawGameState();
             getMoveHistory();
+            getNumberOfPossibleMoves();
         }
 
         function getMoveHistory() {
@@ -217,6 +218,15 @@ gameModule.controller('gameController', ['$rootScope', '$routeParams', '$scope',
                     document.getElementById('autoplay').style.display = 'none';
                 }
                 scope.movesInGame = data.data;
+            }).catch(function (data) {
+                raiseError(data.data.message);
+            });
+        }
+
+        function getNumberOfPossibleMoves() {
+            scope.possibleMoves = 0;
+            return http.get('/move/possible').then(function (data) {
+                scope.possibleMoves = data.data;
             }).catch(function (data) {
                 raiseError(data.data.message);
             });

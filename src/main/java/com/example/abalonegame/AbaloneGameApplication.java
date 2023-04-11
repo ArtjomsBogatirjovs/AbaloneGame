@@ -21,9 +21,8 @@ public class AbaloneGameApplication {
 
 //            save a couple of players
 //            playerRepository.deleteAll();
-//            playerRepository.save(new Player("Player1", new BCryptPasswordEncoder().encode("1")));
-//            playerRepository.save(new Player("Player2", new BCryptPasswordEncoder().encode("1")));
-//            playerRepository.save(new Player("AI", new BCryptPasswordEncoder().encode("gb34r12vfwfc23cx23f")));
+//            playerRepository.save(new Player("User1", new BCryptPasswordEncoder().encode("1")));
+//            playerRepository.save(new Player("User2", new BCryptPasswordEncoder().encode("1")));
         };
     }
 }

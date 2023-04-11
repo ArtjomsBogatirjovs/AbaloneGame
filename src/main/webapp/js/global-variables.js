@@ -5,6 +5,7 @@ let gameStatus;
 let color;
 let opColor;
 
+const winBalls = 5;
 const boardColor = "#a8a098";
 const scale = 50;
 const hexagonHeight = scale * Math.cos(Math.PI / 6) * 2;
